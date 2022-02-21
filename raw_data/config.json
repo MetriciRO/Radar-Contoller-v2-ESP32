@@ -14,10 +14,8 @@
         "detection_direction": "Towards",
         "detection_threshold": "0.15",
         "speed_units": "KPH",
-        "trigger_speed": "30"
-    },
-    "laser": {
-        "state": "Off"
+        "trigger_speed": "30",
+        "laser_state": "Off"
     },
     "user": {
         "username": "",

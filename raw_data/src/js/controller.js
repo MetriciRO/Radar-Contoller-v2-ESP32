@@ -1,17 +1,37 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+import * as model from './model.js';
+import DashboardView from './views/DashboardView.js';
+import Logs from './views/Logs.js';
+import Navbar from './views/Navbar.js';
 
-const getData = async function () {
+const controlDashboard = async function () {
   try {
-    const res = await fetch(
-      'https://mocki.io/v1/4f35e17d-f292-4e32-bf8c-d837fb16de1e'
-    );
-    const data = await res.json();
-
-    console.log(res, data);
+    // 1. Get current Network Settings
+    await model.getNetworkSettings();
+    // 2. Get current Radar Settings
+    await model.getRadarSettings();
+    // 3. Get current User Settings
+    await model.getUser();
+    // 4. Render Navbar
+    Navbar.render();
+    // 5. Render current Settings
+    DashboardView.render(model.state);
+    // 6. Render Logs
+    Logs.render();
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    // toastify
   }
 };
 
-getData();
+const controlSettings = async function () {
+  try {
+  } catch (error) {}
+};
+
+const init = function () {
+  controlDashboard();
+};
+
+init();

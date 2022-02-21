@@ -1,0 +1,27 @@
+{
+    "network_settings": {
+        "connection": "Ethernet",
+        "ip_type": "Static",
+        "mac_address_wifi": "",
+        "mac_address_eth": "",
+        "ip_address": "192.168.0.100",
+        "gateway": "192.168.0.1",
+        "subnet": "255.255.255.0",
+        "dns": "8.8.8.8"
+    },
+    "radar_settings": {
+        "metrici_server_ip": "",
+        "metrici_server_port": "",
+        "detection_direction": "Towards",
+        "detection_threshold": "0.15",
+        "speed_units": "KPH",
+        "trigger_speed": "30"
+    },
+    "laser": {
+        "state": "Off"
+    },
+    "user": {
+        "username": "",
+        "password": ""
+    }
+}

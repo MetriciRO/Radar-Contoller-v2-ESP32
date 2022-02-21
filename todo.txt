@@ -1,0 +1,11 @@
+Split cpp code into headers;
+
+Write radar data into a JSON:
+ - config.json
+
+Create API that sends radar data:
+ - https://mocki.io/v1/4f35e17d-f292-4e32-bf8c-d837fb16de1e
+
+Use Parcel bundler to create interface;
+
+Link the bundled interface to ESP32 back-end;

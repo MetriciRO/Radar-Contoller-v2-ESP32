@@ -9,3 +9,5 @@ Create API that sends radar data:
 Use Parcel bundler to create interface;
 
 Link the bundled interface to ESP32 back-end;
+
+Move .javascript/build to ./data

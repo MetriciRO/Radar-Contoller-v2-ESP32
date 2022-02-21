@@ -1,0 +1,21 @@
+{
+  "name": "radar-interface",
+  "version": "1.0.0",
+  "description": "",
+  "default": "index.html",
+  "scripts": {
+    "start": "parcel index.html --dist-dir ./dist",
+    "build": "parcel build index.html --dist-dir ./build --no-source-maps"
+  },
+  "author": "Sloata George",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.3.2"
+  },
+  "dependencies": {
+    "@parcel/compressor-gzip": "^2.3.2",
+    "core-js": "^3.21.1",
+    "regenerator-runtime": "^0.13.9",
+    "toastify-js": "^1.11.2"
+  }
+}

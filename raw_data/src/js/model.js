@@ -1,6 +1,6 @@
 import { async } from 'regenerator-runtime';
-import { AJAX } from './helpers.js';
-import { API_URL } from './config.js';
+import { AJAX } from './utils/helpers.js';
+import { API_URL } from './utils/config.js';
 
 export const state = {
   network_settings: {},
@@ -16,25 +16,20 @@ const createRadarObject = function (data) {
   const { radar_settings } = data;
   return radar_settings;
 };
+const createUserSetting = function (data) {
+  const { user } = data;
+  return user;
+};
 
-export const getNetworkSettings = async function () {
+export const getLiveState = async function () {
   try {
     const data = await AJAX(`${API_URL}`);
     state.network_settings = createNetworkObject(data);
-    console.log(state.network_settings);
+    state.radar_settings = createRadarObject(data);
+    state.user = createUserSetting(data);
+
+    console.log(state);
   } catch (error) {
     throw error;
   }
-};
-export const getRadarSettings = async function () {
-  try {
-  } catch (error) {}
-};
-export const getLaserState = async function () {
-  try {
-  } catch (error) {}
-};
-export const getUser = async function () {
-  try {
-  } catch (error) {}
 };

@@ -6,11 +6,11 @@
         "gateway": "192.168.0.1",
         "subnet": "255.255.255.0",
         "dns": "8.8.8.8",
-        "mac_address_eth": ""
+        "mac_address_eth": "EC:D8:MF:AA"
     },
     "radar_settings": {
-        "metrici_server_ip": "",
-        "metrici_server_port": "",
+        "metrici_server_ip": "192.168.155.12",
+        "metrici_server_port": "10001",
         "detection_direction": "Towards",
         "detection_threshold": "0.15",
         "speed_units": "KPH",
@@ -18,7 +18,7 @@
         "laser_state": "Off"
     },
     "user": {
-        "username": "",
-        "password": ""
+        "username": "Admin123",
+        "password": "123456789"
     }
 }

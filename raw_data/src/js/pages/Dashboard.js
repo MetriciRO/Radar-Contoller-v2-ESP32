@@ -1,6 +1,6 @@
-import View from './View';
+import View from '../views/View.js';
 
-class DashboardView extends View {
+class Dashboard extends View {
   _parentElement = document.getElementById('content_wrapper');
   _render_location = 'afterbegin';
 
@@ -111,4 +111,4 @@ class DashboardView extends View {
   }
 }
 
-export default new DashboardView();
+export default new Dashboard();

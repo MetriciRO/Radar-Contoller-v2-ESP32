@@ -248,7 +248,7 @@ a:visited#copyright {
 
 @media only screen and (max-width: 767px) {
   #nav_wrapper {
-    position: fixed;
+    position: sticky;
     width: 100vw;
     height: 50px;
     bottom: 0;
@@ -257,12 +257,7 @@ a:visited#copyright {
   #nav_wrapper li {
     font-size: 13px !important;
   }
-  /* Modify margin-bottom acording to the nav height */
   #content_wrapper {
-    margin: auto !important;
-    margin-bottom: 50px !important;
-  }
-  #content_wrapper_user {
     margin: auto !important;
   }
   .user_wrapper {

@@ -4,10 +4,10 @@
 #include <ETH.h>
 
 #include <common.h>
-#include <radar_state.h>
-#include <network_state.h>
-#include <relay_state.h>
-#include <user_state.h>
+#include <state/radar_state.h>
+#include <state/network_state.h>
+#include <state/relay_state.h>
+#include <state/user_state.h>
 
 // Gets settings from live state and returns a json document to be sent to /api/settings/get
 StaticJsonDocument<1024> getLiveState();

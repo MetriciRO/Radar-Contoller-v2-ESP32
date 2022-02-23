@@ -1,3 +1,3 @@
-#include <radar_state.h>
+#include <state/radar_state.h>
 
-Radar::Radar() : Units("KPH"), TriggerSpeed("30"), Direction("Towards"), Threshold("0.15"){};
+Radar::Radar() : units("KPH"), trigger_speed("30"), direction("Towards"), threshold("0.15"){};

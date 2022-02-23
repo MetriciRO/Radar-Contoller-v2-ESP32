@@ -1,4 +1,4 @@
-#include <relay_state.h>
+#include <state/relay_state.h>
 
 // Relays state
 Relay::Relay() : state(""), manual_close(false), start_timer(0), delta_timer(0){};

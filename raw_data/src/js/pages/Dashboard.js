@@ -1,7 +1,8 @@
 import View from '../views/View.js';
+import Logs from '../views/Logs.js';
 
 class Dashboard extends View {
-  _parentElement = document.getElementById('content_wrapper');
+  _parentElement = document.getElementById('content_container');
   _render_location = 'afterbegin';
 
   _generateHTML() {
@@ -107,6 +108,8 @@ class Dashboard extends View {
             </div>
         </div>
     </div>
+    <!-- Logs -->
+    <div class="row p-0 m-0" id="logs_wrapper"></div>
     `;
   }
 }

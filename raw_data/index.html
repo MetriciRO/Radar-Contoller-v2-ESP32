@@ -27,14 +27,18 @@
 
 <body class="d-flex justify-content-center h-100 w-100 bg-black" id="index">
     <div class="container-fluid h-100 w-100 p-0">
-        <div class="row min-vh-100 d-flex flex-column-reverse flex-md-row justify-content-center m-0" id="myApp">
+        <div class="row min-vh-100 d-flex flex-column-reverse flex-md-row justify-content-center m-0">
             <!-- Navbar -->
             <nav class="col-12 col-md-auto p-0 p-md-2" id="nav_wrapper"></nav>
 
-            <!-- Live State -->
-            <div class="col-md-8 col-lg-9 p-0" id="content_wrapper"></div>
+            <!-- Content -->
+            <div class="col-md-8 col-lg-9 p-0" id="content_wrapper">
+                <!-- Live State -->
+                <div id="content_container"></div>
+                <!-- Logs -->
+                <div id="logs_container"></div>
+            </div>
 
-            <!-- Logs -->
         </div>
     </div>
 </body>

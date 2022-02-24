@@ -28,6 +28,32 @@ export const getLiveState = async function () {
   }
 };
 
+export const uploadData = async function (data, object_key) {
+  // console.log(object_key);
+  // Update model.state
+  switch (object_key) {
+    case 'network_settings':
+      state.network_settings = createObject(data, 'network_settings');
+      break;
+    case 'radar_settings':
+      state.radar_settings = createObject(data, 'radar_settings');
+      break;
+    case 'laser':
+      break;
+    case 'backup_form':
+    case 'restore_form':
+    case 'update_form':
+      break;
+    case 'user':
+      state.user = createObject(data, 'user');
+      break;
+    default:
+      break;
+  }
+  // Upload data to server
+  console.log(state);
+};
+
 export const getDataPeriodically = function (s) {
   let interval = setInterval(() => {
     getLiveState().catch((error) => console.log(error));

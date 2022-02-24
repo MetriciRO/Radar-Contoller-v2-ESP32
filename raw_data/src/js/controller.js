@@ -20,6 +20,8 @@ class Router {
     // Get the parsed URl from the addressbar
     let url = '/' + window.location.hash.slice(1).toLowerCase() || '/';
     // console.log('url:', url);
+
+    // Get live state from server on boot-up
     await model.getLiveState();
 
     // Render the Header and footer of the page
@@ -36,12 +38,23 @@ class Router {
 
 const myRouter = new Router();
 
+// View sends form data to Controller
+// Controller sends data to model
+// Model update state
+// Controller renders new state
+
+const controllerUploadData = async function (new_data, which_data) {
+  await model.uploadData(new_data, which_data);
+  // 1. Upload new data to server
+  // 2. Update model.state
+  // 3. Update Views
+};
+
 const init = function () {
   for (const evt of ['hashchange', 'load']) {
     window.addEventListener(evt, myRouter.router);
   }
-
-  // waitForElm('#logs_wrapper').then(() => Logs.render(model.state));
+  Settings.addHandlerUpload(controllerUploadData);
 };
 
 init();

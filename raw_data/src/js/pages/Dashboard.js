@@ -5,6 +5,8 @@ class Dashboard extends View {
   _parentElement = document.getElementById('content_container');
   _render_location = 'afterbegin';
 
+  addHandlerUpdate(handler) {}
+
   _generateHTML() {
     return `
     <!-- First Row Wrapper -->

@@ -69,7 +69,7 @@ class Navbar extends View {
             </ul>
             <hr class="d-none d-md-block">
             <div class="d-none d-md-flex flex-column text-nowrap justify-content-center align-items-center">
-                <a href="https://www.metrici.ro/" id="copyright">Metrici © 2021</a>
+                <a href="https://www.metrici.ro/" id="copyright">Metrici © 2022</a>
                 <p>All Rights Reserved.</p>
             </div>
         </div>

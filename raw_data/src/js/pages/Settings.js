@@ -4,6 +4,18 @@ class Settings extends View {
   _parentElement = document.getElementById('content_container');
   _render_location = 'afterbegin';
 
+  addHandlerUpload(handler) {
+    this._parentElement.addEventListener('submit', function (e) {
+      e.preventDefault();
+      //   console.log(e.target.id);
+      const settings = {};
+      const data_arr = Object.fromEntries([...new FormData(e.target)]);
+      settings[e.target.id] = data_arr;
+      console.log(settings);
+      handler(settings, e.target.id);
+    });
+  }
+
   _generateHTML() {
     return `
     <!-- First Row Wrapper -->
@@ -136,9 +148,9 @@ class Settings extends View {
                         </li>
                     </ul>
                 </div>
-                <div class="card-body tab-content mb-0" id="radar_settings" name="radar_settings">
+                <div class="card-body tab-content mb-0" id="radar" name="radar">
                     <!-- Input form tab -->
-                    <form class="tab-pane active" id="radar" name="radar">
+                    <form class="tab-pane active" id="radar_settings" name="radar_settings">
                         <!-- Server IP - Input row -->
                         <div class="row mb-2 g-0 d-flex justify-content-between">
                             <label for="server_address" class="col-form-label col-4 text-nowrap">Server IP
@@ -249,13 +261,12 @@ class Settings extends View {
                         </li>
                     </ul>
                 </div>
-                <!-- Form -->
                 <div class="card-body tab-content mb-0" style="min-height: 232px">
                     <!-- Backup/Restore tab -->
-                    <div class="tab-pane active" id="backup">
+                    <div class="tab-pane active">
                         <!-- Input row -->
                         <form action="/api/backup" class="row mb-2 g-0 d-flex justify-content-between"
-                            id="backup" name="backup">
+                            id="backup_form" name="backup_form">
                             <label for="backup" class="col-form-label col-12 text-nowrap">Backup current
                                 configuration to file:</label>
                             <div class="col-auto">
@@ -282,8 +293,7 @@ class Settings extends View {
                         <!-- Input row -->
                         <div class="row mb-2 g-0 d-flex justify-content-between" id="soft_reset_container"
                             name="soft_reset_container">
-                            <label for="" class="col-form-label col-12 ">Reset settings
-                                but
+                            <label for="" class="col-form-label col-12 ">Reset settings but
                                 keep Network Configuration:</label>
                             <div class="col-auto">
                                 <button class="btn btn-danger" type="button" name="soft_reset_modal_btn"

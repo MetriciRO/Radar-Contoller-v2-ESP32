@@ -21,7 +21,7 @@ class Navbar extends View {
     let user = `nav-link text-white`;
 
     let location = this._location ?? undefined;
-    console.log('navbar.location: ', location);
+    // console.log('navbar.location: ', location);
 
     if (location) {
       switch (location) {

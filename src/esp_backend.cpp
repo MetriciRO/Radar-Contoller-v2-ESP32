@@ -115,35 +115,47 @@ AsyncCallbackJsonWebHandler *network_handler =
 
                                         changed_network_config = true; });
 
-AsyncCallbackJsonWebHandler *relay_handler =
-    new AsyncCallbackJsonWebHandler("/api/relay/post", [](AsyncWebServerRequest *request, JsonVariant &json)
+AsyncCallbackJsonWebHandler *input_handler =
+    new AsyncCallbackJsonWebHandler("/api/input/post", [](AsyncWebServerRequest *request, JsonVariant &json)
                                     {
-                                        StaticJsonDocument<384> relay_data;
+                                        StaticJsonDocument<384> input_data;
                                         if (json.is<JsonArray>())
                                         {
-                                            relay_data = json.as<JsonArray>();
+                                            input_data = json.as<JsonArray>();
                                         }
                                         else if (json.is<JsonObject>())
                                         {
-                                            relay_data = json.as<JsonObject>();
+                                            input_data = json.as<JsonObject>();
                                         }
 
-                                        updateRelay(relay_data);
-
-                                        if (!relay_data["relay1"]["state1"].isNull())
-                                        {
-                                            saveSettings(relay_data, "relay1");
-                                        }
-                                        if (!relay_data["relay2"]["state2"].isNull())
-                                        {
-                                            saveSettings(relay_data, "relay2");
-                                        }
-
-                                        Serial.println("Received Settings /api/relay/post: ");
-                                        serializeJsonPretty(relay_data, Serial);
+                                        saveSettings(input_data, "input");
+                                        Serial.println("Received Settings: ");
+                                        serializeJsonPretty(input_data, Serial);
                                         Serial.print('\n');
-                                        relay_data.clear();
+                                        input_data.clear();
                                         request->send(200); });
+
+AsyncCallbackJsonWebHandler *user_handler =
+    new AsyncCallbackJsonWebHandler("/api/user/post", [](AsyncWebServerRequest *request, JsonVariant &json)
+                                    {
+    StaticJsonDocument<384> user_data;
+    if (json.is<JsonArray>())
+    {
+        user_data = json.as<JsonArray>();
+    }
+    else if (json.is<JsonObject>())
+    {
+        user_data = json.as<JsonObject>();
+    }
+
+    saveSettings(user_data, "user");
+    Serial.println("Received Settings /api/user/post: ");
+    serializeJsonPretty(user_data, Serial);
+    Serial.print('\n');
+    user_data.clear();
+    // Serial.println(response);
+    restart_flag = true;
+    request->redirect("/dashboard"); });
 
 // Main server function
 void startEspServer()
@@ -221,64 +233,6 @@ void startEspServer()
                   request->send(200, "text/plain", "Multi-Controller will restart in 2 seconds");
                   restart_flag = true; });
 
-    server.on("/relay1/on", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<384> relay_json;
-                  relay_json["relay1"]["state1"] = "On";
-                  updateRelay(relay_json);
-                  saveSettings(relay_json, "relay1");
-                  relay_json.clear();
-                  request->send(200, "text/plain", "Relay 1 is ON"); });
-
-    server.on("/relay1/off", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUserPassword().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<384> relay_json;
-                  relay_json["relay1"]["state1"] = "Off";
-                  updateRelay(relay_json);
-                  saveSettings(relay_json, "relay1");
-                  relay_json.clear();
-
-                  request->send(200, "text/plain", "Relay 1 is OFF"); });
-
-    server.on("/relay2/on", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<384> relay_json;
-                  relay_json["relay2"]["state2"] = "On";
-                  updateRelay(relay_json);
-                  saveSettings(relay_json, "relay2");
-                  relay_json.clear();
-                  request->send(200, "text/plain", "Relay 1 is ON"); });
-
-    server.on("/relay2/off", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<384> relay_json;
-                  relay_json["relay2"]["state2"] = "Off";
-                  updateRelay(relay_json);
-                  saveSettings(relay_json, "relay2");
-                  relay_json.clear();
-
-                  request->send(200, "text/plain", "Relay 1 is OFF"); });
-
     server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request)
               {
                   if (user.user_flag())
@@ -291,26 +245,26 @@ void startEspServer()
                   request->send(200, "text/plain", strlog); });
 
     server.addHandler(network_handler);
-    server.addHandler(relay_handler);
     server.addHandler(user_handler);
 
     if (user.user_flag())
     {
-        server.serveStatic("/settings", SPIFFS, "/settings.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
-        server.serveStatic("/dashboard", SPIFFS, "/index.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
-        server.serveStatic("/user", SPIFFS, "/user.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
+        // server.serveStatic("/settings", SPIFFS, "/settings.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
+        server.serveStatic("/", SPIFFS, "/index.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
+        // server.serveStatic("/user", SPIFFS, "/user.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
     }
     else
     {
-        server.serveStatic("/settings", SPIFFS, "/settings.html");
-        server.serveStatic("/dashboard", SPIFFS, "/index.html");
-        server.serveStatic("/user", SPIFFS, "/user.html");
+        // server.serveStatic("/settings", SPIFFS, "/settings.html");
+        server.serveStatic("/", SPIFFS, "/index.html");
+        // server.serveStatic("/user", SPIFFS, "/user.html");
     }
 
     server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=600");
+    server.rewrite("/", "/index.html");
 
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->redirect("/dashboard"); });
+    // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+    //           { request->redirect("/"); });
     server.onNotFound([](AsyncWebServerRequest *request)
                       { request->send(404); });
 

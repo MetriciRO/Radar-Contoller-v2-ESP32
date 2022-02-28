@@ -2,29 +2,29 @@
 
 void sendToRadar()
 {
-    if (radar.units == "MPH")
+    if (radar_settings.speed_units == "MPH")
     {
         USE_SERIAL1.write("SET speedUnits 0\r\n");
     }
-    else if (radar.units == "KPH")
+    else if (radar_settings.speed_units == "KPH")
     {
         USE_SERIAL1.write("SET speedUnits 1\r\n");
     }
-    String str_1 = "SET output1min " + radar.trigger_speed + "\r\n";
+    String str_1 = "SET output1min " + radar_settings.trigger_speed + "\r\n";
     USE_SERIAL1.write(str_1.c_str());
-    if (radar.direction == "Towards")
+    if (radar_settings.detection_direction == "Towards")
     {
         USE_SERIAL1.write("SET detectionDirection 0\r\n");
     }
-    else if (radar.direction == "Away")
+    else if (radar_settings.detection_direction == "Away")
     {
         USE_SERIAL1.write("SET detectionDirection 1\r\n");
     }
-    else if (radar.direction == "Bidirectional")
+    else if (radar_settings.detection_direction == "Bidirectional")
     {
         USE_SERIAL1.write("SET detectionDirection 2\r\n");
     }
-    String str_2 = "SET detectionThreshold " + radar.threshold + "\r\n";
+    String str_2 = "SET detectionThreshold " + radar_settings.detection_threshold + "\r\n";
     USE_SERIAL1.write(str_2.c_str());
 }
 
@@ -34,9 +34,8 @@ WiFiUDP udp;
 WiFiServer TCPserver(10001);
 
 String radar_command = "";
-// UDP Credentials
-String metrici_server_ip = "0.0.0.0";
-String metrici_server_port = "0000"; // server port
+// String metrici_server_ip = "0.0.0.0";
+// String metrici_server_port = "0000"; // server port
 String port_old = "";
 
 unsigned int start_timer_serial = 0;
@@ -100,13 +99,13 @@ void radarRoutine()
             }
 
             // Check for SERVER's PORT and initializes UDP
-            if (port_old != metrici_server_port && metrici_server_port != "0000")
+            if (port_old != radar_settings.metrici_server_port && radar_settings.metrici_server_port != "0000")
             {
-                port_old = metrici_server_port;
+                port_old = radar_settings.metrici_server_port;
                 Serial.println("New Server Port: " + port_old);
                 udp.stop();
                 delay(100);
-                udp.begin(metrici_server_port.toInt());
+                udp.begin(radar_settings.metrici_server_port.toInt());
             }
 
             // Send UDP packet if trigger was sent from Radar
@@ -116,9 +115,9 @@ void radarRoutine()
                 logOutput("Trigger sent");
                 uint8_t buffer[19] = "statechange,201,1\r";
                 // send packet to server
-                if (metrici_server_ip.length() != 0)
+                if (radar_settings.metrici_server_ip.length() != 0)
                 {
-                    udp.beginPacket(metrici_server_ip.c_str(), metrici_server_port.toInt());
+                    udp.beginPacket(radar_settings.metrici_server_ip.c_str(), radar_settings.metrici_server_port.toInt());
                     udp.write(buffer, sizeof(buffer));
                     delay(30);
                     Serial.println(udp.endPacket());

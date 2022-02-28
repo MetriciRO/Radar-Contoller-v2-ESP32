@@ -8,15 +8,29 @@ class Settings extends View {
     this._parentElement.addEventListener('submit', function (e) {
       e.preventDefault();
       //   console.log(e.target.id);
-      const settings = {};
-      const data_arr = Object.fromEntries([...new FormData(e.target)]);
-      settings[e.target.id] = data_arr;
-      console.log(settings);
+      const settings = {
+        [e.target.id]: Object.fromEntries(new FormData(e.target)),
+      };
+
+      console.log('settings: ', settings);
       handler(settings, e.target.id);
     });
   }
+  // Handler to check IP Address format
+  // Handler to enable or disable network inputs based on IP type
+  addHandlerCheckIpType(handler) {
+    this._parentElement.addEventListener('change', function (e) {
+      e.preventDefault();
+      handler(e.target);
+    });
+  }
+
+  _checkIpType() {
+    console.log('Inside Settings');
+  }
 
   _generateHTML() {
+    const ip_type = this._state.network_settings.ip_type;
     return `
     <!-- First Row Wrapper -->
     <div class="row p-0 m-0">
@@ -34,21 +48,12 @@ class Settings extends View {
                         <label class="col-form-label col-4 text-nowrap">Connected: </label>
                         <label class="col-form-label col-auto text-nowrap" id="connected"></label>
                     </div>
-                    <!-- Radio Buttons Connection -->
+                    <!-- Conenction Type - Row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label class="col-form-label col-4 text-nowrap">Connection Type: </label>
-                        <div class="btn-group col-auto" id="check_network_connection"
-                            style="min-width: 207px; max-width: 207px;">
-                            <input type="radio" class="btn-check" name="connection" id="wifi"
-                                autocomplete="off" value="WiFi">
-                            <label class="btn btn-outline-danger shadow-none text-white"
-                                for="wifi">WiFi</label>
-
-                            <input type="radio" class="btn-check" name="connection" id="ethernet"
-                                autocomplete="off" value="Ethernet" checked>
-                            <label class="btn btn-outline-danger shadow-none text-white"
-                                for="ethernet">Ethernet</label>
-                        </div>
+                        <label class="col-form-label col-auto text-nowrap">${
+                          this._state.network_settings.connection
+                        }</label>
                     </div>
                     <!-- Radio Buttons IP Type -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
@@ -56,40 +61,30 @@ class Settings extends View {
                         <div class="btn-group col" style="min-width: 207px; max-width: 207px;"
                             id="check_ip_type">
                             <input type="radio" class="btn-check" name="ip_type" id="dhcp"
-                                autocomplete="off" value="DHCP" checked>
+                                autocomplete="off" value="DHCP" ${
+                                  ip_type === 'DHCP' ? 'checked' : ''
+                                }>
                             <label class="btn btn-outline-danger shadow-none text-white"
                                 for="dhcp">DHCP</label>
 
                             <input type="radio" class="btn-check" name="ip_type" id="static"
-                                autocomplete="off" value="Static">
+                                autocomplete="off" value="Static"  ${
+                                  ip_type === 'Static' ? 'checked' : ''
+                                }>
                             <label class="btn btn-outline-danger shadow-none text-white"
                                 for="static">Static</label>
                         </div>
                     </div>
 
-                    <!-- SSID - Input row -->
-                    <div class="row mb-2 g-0 d-flex justify-content-between">
-                        <label for="ssid" class="col-form-label col-4 text-nowrap">SSID:</label>
-                        <div class="col-auto">
-                            <input type="text" class="SSID connection form-control" name="ssid" id="ssid"
-                                placeholder="SSID">
-                        </div>
-                    </div>
-                    <!-- Password - Input row -->
-                    <div class="row mb-2 g-0 d-flex justify-content-between">
-                        <label for="password" class="col-form-label col-4 text-nowrap">Password:</label>
-                        <div class="col-auto">
-                            <input type="password" class="Password connection form-control" name="password"
-                                id="password" placeholder="Password" minlength="8">
-                        </div>
-                    </div>
                     <!-- IP Address - Input row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label for="ip_address" class="col-form-label col-4 text-nowrap">IP
                             Address:</label>
                         <div class="col-auto">
                             <input type="text" class="IP-Address ip form-control" name="ip_address"
-                                id="ip_address" placeholder="IP-Address">
+                                id="ip_address" placeholder="IP-Address"  ${
+                                  ip_type === 'DHCP' ? 'disabled' : ''
+                                }>
                         </div>
                     </div>
                     <!-- Gateway - Input row -->
@@ -97,7 +92,9 @@ class Settings extends View {
                         <label for="gateway" class="col-form-label col-4 text-nowrap">Gateway:</label>
                         <div class="col-auto">
                             <input type="text" class="Gateway ip form-control" name="gateway" id="gateway"
-                                placeholder="Gateway">
+                                placeholder="Gateway" ${
+                                  ip_type === 'DHCP' ? 'disabled' : ''
+                                }>
                         </div>
                     </div>
                     <!-- Subnet Mask - Input row -->
@@ -106,7 +103,9 @@ class Settings extends View {
                             Mask:</label>
                         <div class="col-auto">
                             <input class="Subnet-Mask ip form-control" list="subnet_options" name="subnet"
-                                id="subnet" placeholder="Subnet-Mask">
+                                id="subnet" placeholder="Subnet-Mask" ${
+                                  ip_type === 'DHCP' ? 'disabled' : ''
+                                }>
                         </div>
                         <datalist id="subnet_options">
                             <option value="255.255.255.0">
@@ -119,7 +118,9 @@ class Settings extends View {
                         <label for="dns" class="col-form-label col-4 text-nowrap">DNS:</label>
                         <div class="col-auto">
                             <input class="DNS ip form-control" list="dns_options" name="dns" id="dns"
-                                placeholder="DNS">
+                                placeholder="DNS" ${
+                                  ip_type === 'DHCP' ? 'disabled' : ''
+                                }>
                         </div>
                         <datalist id="dns_options">
                             <option value="8.8.8.8">
@@ -140,7 +141,7 @@ class Settings extends View {
                     <ul class="nav nav-tabs card-header-tabs" data-bs-tabs="tabs">
                         <li class="nav-item">
                             <a class="nav-link active text-white" aria-current="true" data-bs-toggle="tab"
-                                href="#radar">Radar</a>
+                                href="#radar_settings">Radar</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" data-bs-toggle="tab" href="#laser">Laser</a>
@@ -148,7 +149,7 @@ class Settings extends View {
                         </li>
                     </ul>
                 </div>
-                <div class="card-body tab-content mb-0" id="radar" name="radar">
+                <div class="card-body tab-content mb-0">
                     <!-- Input form tab -->
                     <form class="tab-pane active" id="radar_settings" name="radar_settings">
                         <!-- Server IP - Input row -->
@@ -223,7 +224,7 @@ class Settings extends View {
                     <form class="tab-pane" id="laser" name="laser">
                         <!-- Laser State - Radio Button Input row -->
                         <div class="row mb-2 g-0 d-flex justify-content-between">
-                            <label class="col-form-label col-4 text-nowrap" for="laser">Laser: </label>
+                            <label class="col-form-label col-4 text-nowrap" for="laser_state">Laser: </label>
                             <div class="btn-group col" style="min-width: 207px; max-width: 207px;"
                                 id="laser_state">
                                 <input type="radio" class="btn-check" name="laser" id="laser_on"
@@ -263,11 +264,11 @@ class Settings extends View {
                 </div>
                 <div class="card-body tab-content mb-0" style="min-height: 232px">
                     <!-- Backup/Restore tab -->
-                    <div class="tab-pane active">
+                    <div class="tab-pane active" id="backup">
                         <!-- Input row -->
                         <form action="/api/backup" class="row mb-2 g-0 d-flex justify-content-between"
                             id="backup_form" name="backup_form">
-                            <label for="backup" class="col-form-label col-12 text-nowrap">Backup current
+                            <label for="backup_btn" class="col-form-label col-12 text-nowrap">Backup current
                                 configuration to file:</label>
                             <div class="col-auto">
                                 <button class="btn btn-danger" type="submit" name="backup_btn"
@@ -276,7 +277,7 @@ class Settings extends View {
                             </div>
                         </form>
                         <!-- Input row -->
-                        <label for="restore" class="form-label">Restore configuration from
+                        <label for="restore_file" class="form-label">Restore configuration from
                             file:</label>
                         <form class="row g-2 d-flex justify-content-between" method="POST"
                             enctype="multipart/form-data" name="restore_form" id="restore_form">

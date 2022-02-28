@@ -6,15 +6,22 @@ StaticJsonDocument<1024> getLiveState()
 
     doc["network_settings"]["connection"] = network_settings.connection;
     doc["network_settings"]["ip_type"] = network_settings.ip_type;
-    doc["network_settings"]["ssid"] = network_settings.ssid;
-    doc["network_settings"]["password"] = network_settings.password;
+    // doc["network_settings"]["ssid"] = network_settings.ssid;
+    // doc["network_settings"]["password"] = network_settings.password;
 
-    doc["network_settings"]["mac_address_wifi"] = WiFi.macAddress();
-    doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
     doc["network_settings"]["ip_address"] = network_settings.ip_address;
     doc["network_settings"]["gateway"] = network_settings.gateway;
     doc["network_settings"]["subnet"] = network_settings.subnet;
     doc["network_settings"]["dns"] = network_settings.dns;
+    doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
+
+    doc["radar_settings"]["metrici_server_ip"] = radar_settings.metrici_server_ip;
+    doc["radar_settings"]["metrici_server_port"] = radar_settings.metrici_server_port;
+    doc["radar_settings"]["detection_direction"] = radar_settings.detection_direction;
+    doc["radar_settings"]["detection_threshold"] = radar_settings.detection_threshold;
+    doc["radar_settings"]["speed_units"] = radar_settings.speed_units;
+    doc["radar_settings"]["trigger_speed"] = radar_settings.trigger_speed;
+    doc["radar_settings"]["laser_state"] = radar_settings.laser_state;
 
     doc["user"]["username"] = user.getUsername();
     doc["user"]["password"] = user.getUserPassword();

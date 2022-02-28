@@ -1,15 +1,14 @@
 #pragma once
 
-#include <state.h>
+#include <state/state.h>
+#include <common.h>
 
-String radar_command;
-String metrici_server_ip;
-String metrici_server_port;
-String port_old;
+extern String radar_command;
+extern String port_old;
 
-unsigned int start_timer_serial;
-unsigned int delta_timer_serial;
-bool trigger;
+extern unsigned int start_timer_serial;
+extern unsigned int delta_timer_serial;
+extern bool trigger;
 
 void radarRoutine();
 void sendToRadar();

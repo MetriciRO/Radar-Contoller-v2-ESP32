@@ -13,6 +13,8 @@ export default class View {
     // console.log(this._state);
     const markup = this._generateHTML();
     this._parentElement.insertAdjacentHTML(this._render_location, markup);
+    // Update rendered interface based on live state
+    // this._checkIpType?.();
   }
 
   // addHandlerRender(handler) {

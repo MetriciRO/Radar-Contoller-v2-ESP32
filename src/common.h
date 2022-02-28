@@ -20,7 +20,7 @@
 
 #define DEBOUNCE_TIME 20
 
-HardwareSerial USE_SERIAL1;
+extern HardwareSerial USE_SERIAL1;
 
 extern ezButton triggerPin;
 

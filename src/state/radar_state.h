@@ -5,9 +5,16 @@
 class Radar
 {
 public:
-    String units;
+    // UDP Credentials
+    String metrici_server_ip;
+    String metrici_server_port;
+    // Radar parameters
+    String detection_direction;
+    String detection_threshold;
+    String speed_units;
     String trigger_speed;
-    String direction;
-    String threshold;
+    // Laser State (Relay 1 [GPIO 32])
+    String laser_state;
+    Radar();
 };
-extern Radar radar;
+extern Radar radar_settings;

@@ -50,11 +50,43 @@ const controllerUploadData = async function (new_data, which_data) {
   // 3. Update Views
 };
 
+const controllerIpType = function (data) {
+  let ip = document.querySelectorAll('.ip');
+  let current_placeholder = {};
+  ip.forEach((element) => {
+    let classList = element.className.split(' ');
+    current_placeholder[element.id] = classList[0];
+  });
+  switch (data.id) {
+    case 'dhcp':
+      ip.forEach((element) => {
+        element.setAttribute('readonly', '');
+        element.value = '';
+        element.classList.remove('wrong');
+        element.classList.remove('correct');
+        element.setAttribute('placeholder', 'DHCP IP');
+      });
+      break;
+    case 'static':
+      ip.forEach((element) => {
+        element.removeAttribute('readonly');
+        element.setAttribute(
+          'placeholder',
+          `${current_placeholder[element.id]}`
+        );
+      });
+      break;
+    default:
+      break;
+  }
+};
+
 const init = function () {
   for (const evt of ['hashchange', 'load']) {
     window.addEventListener(evt, myRouter.router);
   }
   Settings.addHandlerUpload(controllerUploadData);
+  Settings.addHandlerCheckIpType(controllerIpType);
 };
 
 init();

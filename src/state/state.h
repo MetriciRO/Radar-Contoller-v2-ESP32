@@ -6,7 +6,7 @@
 #include <common.h>
 #include <state/radar_state.h>
 #include <state/network_state.h>
-#include <state/relay_state.h>
+// #include <state/relay_state.h>
 #include <state/user_state.h>
 
 // Gets settings from live state and returns a json document to be sent to /api/settings/get
@@ -16,7 +16,7 @@ StaticJsonDocument<1024> getLiveState();
 void updateLiveState(StaticJsonDocument<1024> &doc);
 
 // Updates relays state
-void updateRelay(StaticJsonDocument<384> json);
+// void updateRelay(StaticJsonDocument<384> json);
 
 // Reads settings from /config.json and updates live state
 StaticJsonDocument<1024> readSettings();

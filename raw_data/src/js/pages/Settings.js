@@ -4,29 +4,24 @@ class Settings extends View {
   _parentElement = document.getElementById('content_container');
   _render_location = 'afterbegin';
 
-  addHandlerUpload(handler) {
+  addHandlerUploadData(handler) {
     this._parentElement.addEventListener('submit', function (e) {
       e.preventDefault();
-      //   console.log(e.target.id);
-      const settings = {
-        [e.target.id]: Object.fromEntries(new FormData(e.target)),
-      };
-
-      console.log('settings: ', settings);
-      handler(settings, e.target.id);
+      handler(e.target);
     });
   }
-  // Handler to check IP Address format
-  // Handler to enable or disable network inputs based on IP type
-  addHandlerCheckIpType(handler) {
+
+  addHandlerChangeEvents(handler) {
     this._parentElement.addEventListener('change', function (e) {
       e.preventDefault();
       handler(e.target);
     });
   }
 
-  _checkIpType() {
-    console.log('Inside Settings');
+  addHandlerOpenModal(handler) {
+    this._parentElement.addEventListener('click', function (e) {
+      handler(e);
+    });
   }
 
   _generateHTML() {
@@ -51,9 +46,8 @@ class Settings extends View {
                     <!-- Conenction Type - Row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label class="col-form-label col-4 text-nowrap">Connection Type: </label>
-                        <label class="col-form-label col-auto text-nowrap">${
-                          this._state.network_settings.connection
-                        }</label>
+                        <label class="col-form-label col-auto text-nowrap">
+                        ${this._state.network_settings.connection}</label>
                     </div>
                     <!-- Radio Buttons IP Type -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
@@ -61,16 +55,14 @@ class Settings extends View {
                         <div class="btn-group col" style="min-width: 207px; max-width: 207px;"
                             id="check_ip_type">
                             <input type="radio" class="btn-check" name="ip_type" id="dhcp"
-                                autocomplete="off" value="DHCP" ${
-                                  ip_type === 'DHCP' ? 'checked' : ''
-                                }>
+                                autocomplete="off" value="DHCP"
+                                ${ip_type === 'DHCP' ? 'checked' : ''}>
                             <label class="btn btn-outline-danger shadow-none text-white"
                                 for="dhcp">DHCP</label>
 
                             <input type="radio" class="btn-check" name="ip_type" id="static"
-                                autocomplete="off" value="Static"  ${
-                                  ip_type === 'Static' ? 'checked' : ''
-                                }>
+                                autocomplete="off" value="Static" 
+                                ${ip_type === 'Static' ? 'checked' : ''}>
                             <label class="btn btn-outline-danger shadow-none text-white"
                                 for="static">Static</label>
                         </div>
@@ -81,20 +73,18 @@ class Settings extends View {
                         <label for="ip_address" class="col-form-label col-4 text-nowrap">IP
                             Address:</label>
                         <div class="col-auto">
-                            <input type="text" class="IP-Address ip form-control" name="ip_address"
-                                id="ip_address" placeholder="IP-Address"  ${
-                                  ip_type === 'DHCP' ? 'disabled' : ''
-                                }>
+                            <input type="text" class="IP-Address ip static form-control" name="ip_address"
+                                id="ip_address" placeholder="IP-Address"
+                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                     </div>
                     <!-- Gateway - Input row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label for="gateway" class="col-form-label col-4 text-nowrap">Gateway:</label>
                         <div class="col-auto">
-                            <input type="text" class="Gateway ip form-control" name="gateway" id="gateway"
-                                placeholder="Gateway" ${
-                                  ip_type === 'DHCP' ? 'disabled' : ''
-                                }>
+                            <input type="text" class="Gateway ip static form-control" name="gateway" id="gateway"
+                                placeholder="Gateway"
+                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                     </div>
                     <!-- Subnet Mask - Input row -->
@@ -102,10 +92,9 @@ class Settings extends View {
                         <label for="subnet" class="col-form-label col-4 text-nowrap">Subnet
                             Mask:</label>
                         <div class="col-auto">
-                            <input class="Subnet-Mask ip form-control" list="subnet_options" name="subnet"
-                                id="subnet" placeholder="Subnet-Mask" ${
-                                  ip_type === 'DHCP' ? 'disabled' : ''
-                                }>
+                            <input class="Subnet-Mask ip static form-control" list="subnet_options" name="subnet"
+                                id="subnet" placeholder="Subnet-Mask"
+                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                         <datalist id="subnet_options">
                             <option value="255.255.255.0">
@@ -117,10 +106,9 @@ class Settings extends View {
                     <div class="row mb-3 g-0 d-flex justify-content-between">
                         <label for="dns" class="col-form-label col-4 text-nowrap">DNS:</label>
                         <div class="col-auto">
-                            <input class="DNS ip form-control" list="dns_options" name="dns" id="dns"
-                                placeholder="DNS" ${
-                                  ip_type === 'DHCP' ? 'disabled' : ''
-                                }>
+                            <input class="DNS ip static form-control" list="dns_options" name="dns" id="dns"
+                                placeholder="DNS" 
+                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                         <datalist id="dns_options">
                             <option value="8.8.8.8">
@@ -152,13 +140,13 @@ class Settings extends View {
                 <div class="card-body tab-content mb-0">
                     <!-- Input form tab -->
                     <form class="tab-pane active" id="radar_settings" name="radar_settings">
-                        <!-- Server IP - Input row -->
+                        <!-- Server Address - Input row -->
                         <div class="row mb-2 g-0 d-flex justify-content-between">
-                            <label for="server_address" class="col-form-label col-4 text-nowrap">Server IP
+                            <label for="server_address" class="col-form-label col-4 text-nowrap">Server
                                 Address:</label>
                             <div class="col-auto">
-                                <input type="text" class="form-control" name="server_address"
-                                    id="server_address" placeholder="IP-Address">
+                                <input type="url" class="Server-Address url form-control" name="server_address"
+                                    id="server_address" placeholder="Server-Address">
                             </div>
                         </div>
                         <!-- Server Port - Input row -->
@@ -166,7 +154,7 @@ class Settings extends View {
                             <label for="server_port" class="col-form-label col-4 text-nowrap">Server
                                 Port:</label>
                             <div class="col-auto">
-                                <input type="text" class="form-control" name="server_port" id="server_port"
+                                <input type="text" class="Server-Port number form-control" name="server_port" id="server_port"
                                     placeholder="Port">
                             </div>
                         </div>
@@ -175,7 +163,7 @@ class Settings extends View {
                             <label for="detection_direction"
                                 class="col-form-label col-4 text-nowrap">Detection Direction:</label>
                             <div class="col-auto">
-                                <input class="form-control" list="detection_direction_options"
+                                <input class="Detection-Direction list form-control" list="detection_direction_options"
                                     name="detection_direction" id="detection_direction"
                                     placeholder="Detection Direction">
                             </div>
@@ -190,7 +178,7 @@ class Settings extends View {
                             <label for="detection_threshold"
                                 class="col-form-label col-4 text-nowrap">Detection Threshold:</label>
                             <div class="col-auto">
-                                <input type="text" class="form-control" name="detection_threshold"
+                                <input type="text" class="Detection-Threshold number form-control" name="detection_threshold"
                                     id="detection_threshold" placeholder="Detection Threshold">
                             </div>
                         </div>
@@ -199,7 +187,7 @@ class Settings extends View {
                             <label for="speed_units" class="col-form-label col-4 text-nowrap">Speed
                                 Units:</label>
                             <div class="col-auto">
-                                <input class="form-control" list="speed_units_options" name="speed_units"
+                                <input class="Speed-Units list form-control" list="speed_units_options" name="speed_units"
                                     id="speed_units" placeholder="Speed Units">
                             </div>
                             <datalist id="speed_units_options">
@@ -213,7 +201,7 @@ class Settings extends View {
                             <label for="trigger_speed" class="col-form-label col-4 text-nowrap">Trigger
                                 Speed:</label>
                             <div class="col-auto">
-                                <input type="text" class="form-control" name="trigger_speed"
+                                <input type="text" class="Trigger-Speed number form-control" name="trigger_speed"
                                     id="trigger_speed" placeholder="Trigger Speed">
                             </div>
                         </div>
@@ -297,8 +285,8 @@ class Settings extends View {
                             <label for="" class="col-form-label col-12 ">Reset settings but
                                 keep Network Configuration:</label>
                             <div class="col-auto">
-                                <button class="btn btn-danger" type="button" name="soft_reset_modal_btn"
-                                    id="soft_reset_modal_btn" data-reset='Soft'
+                                <button class="btn btn-danger modal_buton" type="button" name="Soft Reset"
+                                    id="soft_reset" data-reset='Soft'
                                     style="min-width: 120px;">Soft Reset</button>
                             </div>
                         </div>
@@ -308,9 +296,8 @@ class Settings extends View {
                             <label for="" class="col-form-label col-12 text-nowrap">Reset
                                 all settings:</label>
                             <div class="col-auto">
-                                <button class="btn btn-danger" type="button" name="factory_reset_modal_btn"
-                                    id="factory_reset_modal_btn" data-reset='Factory'
-                                    style="min-width: 120px;">Factory
+                                <button class="btn btn-danger modal_buton" type="button" name="Factory Reset"
+                                    id="factory_reset" data-reset='Factory' style="min-width: 120px;">Factory
                                     Reset</button>
                             </div>
                         </div>

@@ -11,3 +11,7 @@ Use Parcel bundler to create interface;
 Link the bundled interface to ESP32 back-end;
 
 Move .javascript/build to ./data
+
+Create Modal for Network and Radar Settings forms (same as reset):
+    - Empty inputs will not change
+    - Maybe replace empty inputs with "WILL NOT CHANGE" or the current value

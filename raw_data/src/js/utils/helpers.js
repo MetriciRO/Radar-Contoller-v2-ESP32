@@ -71,3 +71,14 @@ export const checkInputFormat = function (input, check_format = undefined) {
     }
   }
 };
+
+export const checkUserDataFormat = function (input) {
+  switch (input.id) {
+    case 'username':
+    case 'password':
+      if (input.value.length <= 0) return wrong_format(input);
+      else return correct_format(input);
+    default:
+      break;
+  }
+};

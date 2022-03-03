@@ -4,10 +4,10 @@ class Settings extends View {
   _parentElement = document.getElementById('content_container');
   _render_location = 'afterbegin';
 
-  addHandlerUploadData(handler) {
+  addHandlerSubmitEvents(handler) {
     this._parentElement.addEventListener('submit', function (e) {
       e.preventDefault();
-      handler(e.target);
+      handler(e);
     });
   }
 

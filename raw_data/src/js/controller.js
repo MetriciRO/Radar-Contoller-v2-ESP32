@@ -1,7 +1,11 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import * as model from './model.js';
-import { checkInputFormat, AJAX } from './utils/helpers.js';
+import {
+  checkInputFormat,
+  checkUserDataFormat,
+  AJAX,
+} from './utils/helpers.js';
 import { IP_FORMAT, NUMBER_FORMAT, URL_FORMAT } from './utils/config.js';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
@@ -10,6 +14,7 @@ import User from './pages/User';
 import Navbar from './views/Navbar';
 import Logs from './views/Logs';
 import Modal from './views/Modal.js';
+import { async } from 'regenerator-runtime';
 
 class Router {
   _routes = {
@@ -48,14 +53,21 @@ const myRouter = new Router();
 
 // Check the format of the IP inputs @change
 const controllerInputFormat = function (input) {
+  // Check IP Inputs format
   if (input.className.split(' ').includes('ip'))
     return checkInputFormat(input, IP_FORMAT);
+  // Check Number Inputs format
   else if (input.className.split(' ').includes('number'))
     return checkInputFormat(input, NUMBER_FORMAT);
+  // Check URL Inputs format
   else if (input.className.split(' ').includes('url'))
     return checkInputFormat(input, URL_FORMAT);
+  // Check List Inputs format
   else if (input.className.split(' ').includes('list'))
     return checkInputFormat(input);
+  // Check User Inputs format
+  else if (input.className.split(' ').includes('user'))
+    return checkUserDataFormat(input);
   // Return true for radio buttons
   return true;
 };
@@ -67,7 +79,6 @@ const controllerInputFormat = function (input) {
     - a valid input - used  to create or update a setting
 */
 const validateForm = function (form) {
-  // console.log(form);
   for (const element of form.elements) {
     if (element.placeholder === 'DHCP IP') continue;
     if (!controllerInputFormat(element)) return false;
@@ -76,6 +87,7 @@ const validateForm = function (form) {
 };
 
 const controllerUploadData = async function (form) {
+  if (form.name === 'user') return;
   // 1. Validate form
   if (!validateForm(form)) {
     console.log('Did not validate data');
@@ -85,22 +97,20 @@ const controllerUploadData = async function (form) {
   const new_data = {
     [form.id]: Object.fromEntries(new FormData(form)),
   };
-  console.log(new_data);
 
   // 1.5 Open modal with data
   // Modal.render(new_data);
 
   // 3. Upload new data to server
-  // await model.uploadData(new_data, form.id);
+  await model.sendData(new_data, form.id);
   // 4. Update model.state
   // 5. Update Views
+  form.reset();
 };
 
 const controllerLaserState = async function (target) {
-  console.log(target.value);
-  // Upload laser state to server
-  await model.sendLaserState(target.value);
-  // Update model state
+  // Send current laser value to model
+  await model.sendData(target.value, target.name);
   // Update Views
 };
 
@@ -154,6 +164,64 @@ const controllerOpenModal = function (event) {
   Modal.addHandlerResetForm(controllerResetForm);
 };
 
+const controllerUploadFile = function (event) {
+  const form = event.target;
+  for (const element of form.elements) {
+    if (element.type === 'file') {
+      const filename = element.files[0].name;
+      switch (element.id) {
+        case 'restore_file':
+          switch (filename) {
+            case 'config.json':
+              console.log('File is good.');
+              // Toast
+              break;
+            default:
+              console.log('File is no good !');
+              // Toast
+              event.preventDefault();
+              break;
+          }
+          break;
+        case 'update_file':
+          switch (filename) {
+            case 'spiffs.bin':
+            case 'firmware.bin':
+              console.log('Update file is valid. Update will proceed');
+              // toast(`File ${filename} was successfully uploaded !`, true);
+              // toast(`The update process has started...`, true);
+              // updatingToast('Updating...', true);
+              break;
+            default:
+              // toast('File was not uploaded. Try again !', false);
+              console.log('Update file is not valid. Update is not possible !');
+              event.preventDefault();
+              break;
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  }
+};
+
+// Handle all submit events on the Settings page
+const controllerSettingsSubmitEvents = async function (event) {
+  switch (event.target.name) {
+    case 'network_settings':
+    case 'radar_settings':
+      controllerUploadData(event.target);
+      break;
+    case 'restore_form':
+    case 'update_form':
+      controllerUploadFile(event);
+    default:
+      break;
+  }
+};
+
+// Handle all change events on the Settings Page
 const controllerSettingsChangeEvents = async function (target) {
   // console.log(target.name);
   switch (target.name) {
@@ -166,19 +234,37 @@ const controllerSettingsChangeEvents = async function (target) {
       await controllerLaserState(target);
       break;
     default:
-      // Handler to check IP Address input format
+      // Handler to check every Input format
       controllerInputFormat(target);
       break;
   }
+};
+
+// Handle User data upload
+const controllerUploadUserData = async function (form) {
+  if (form.name !== 'user') return;
+  // console.log(form);
+  // Validate User data
+  if (!validateForm(form)) {
+    console.log('Data could not be validated !');
+    return;
+  }
+  const new_data = {
+    [form.name]: Object.fromEntries(new FormData(form)),
+  };
+  // Send User data to model
+  await model.sendData(new_data, form.id);
+  form.reset();
 };
 
 const init = function () {
   for (const evt of ['hashchange', 'load']) {
     window.addEventListener(evt, myRouter.router);
   }
-  Settings.addHandlerUploadData(controllerUploadData);
+  Settings.addHandlerSubmitEvents(controllerSettingsSubmitEvents);
   Settings.addHandlerChangeEvents(controllerSettingsChangeEvents);
   Settings.addHandlerOpenModal(controllerOpenModal);
+  User.addHandlerUploadUserData(controllerUploadUserData);
 };
 
 init();

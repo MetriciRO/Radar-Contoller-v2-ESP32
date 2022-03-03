@@ -1,6 +1,6 @@
 import { async } from 'regenerator-runtime';
 import { AJAX } from './utils/helpers.js';
-import { API_GET_SETTINGS, API_POST_NETWORK } from './utils/config.js';
+import * as config from './utils/config.js';
 
 export const state = {
   network_settings: {},
@@ -17,7 +17,7 @@ const createObject = function (data, object_key) {
 
 export const getLiveState = async function () {
   try {
-    const data = await AJAX(`${API_GET_SETTINGS}`);
+    const data = await AJAX(`${config.API_GET_SETTINGS}`);
     state.network_settings = createObject(data, 'network_settings');
     state.radar_settings = createObject(data, 'radar_settings');
     state.user = createObject(data, 'user');
@@ -29,29 +29,37 @@ export const getLiveState = async function () {
   }
 };
 
-export const uploadData = async function (data, object_key) {
-  // console.log(object_key);
+export const sendData = async function (data, target) {
+  // console.log(target);
   // Update model.state
   try {
-    switch (object_key) {
+    switch (target) {
       case 'network_settings':
         // Update state object
         state.network_settings = createObject(data, 'network_settings');
-        // console.log(state.network_settings);
-        AJAX(API_POST_NETWORK, state.network_settings);
+        console.log(state.network_settings);
+        AJAX(config.API_POST_NETWORK, state.network_settings);
         // Upload state object
         break;
       case 'radar_settings':
         state.radar_settings = createObject(data, 'radar_settings');
+        console.log(state.radar_settings);
+        AJAX(config.API_POST_RADAR, state.radar_settings);
         break;
       case 'laser':
+        state.laser.state = data;
+        console.log(state.laser);
+        AJAX(config.API_POST_LASER, state.laser);
         break;
       case 'backup_form':
       case 'restore_form':
       case 'update_form':
         break;
-      case 'user':
+      case 'user_form':
         state.user = createObject(data, 'user');
+        console.log(state.user);
+        AJAX(config.API_POST_USER, state.user);
+
         break;
       default:
         break;
@@ -73,10 +81,10 @@ export const getDataPeriodically = function (s) {
 export const sendReset = async function (target) {
   switch (target.innerText) {
     case 'Soft Reset':
-      await AJAX('/api/soft-reset');
+      await AJAX(config.API_GET_SOFT_RESET);
       break;
     case 'Factory Reset':
-      await AJAX('/api/factory-reset');
+      await AJAX(config.API_GET_FACTORY_RESET);
       break;
     default:
       break;
@@ -84,7 +92,8 @@ export const sendReset = async function (target) {
 };
 
 export const sendLaserState = async function (value) {
+  // Update model state
   state.laser.state = value;
-  console.log(state.laser);
-  await AJAX('/api/laser-state', state.laser);
+  // console.log(state.laser);
+  await AJAX(config.API_POST_LASER, state.laser);
 };

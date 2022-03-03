@@ -4,6 +4,12 @@ class User extends View {
   _parentElement = document.getElementById('content_container');
   _render_location = 'beforeend';
 
+  addHandlerUploadUserData(handler) {
+    this._parentElement.addEventListener('submit', function (e) {
+      handler(e.target);
+    });
+  }
+
   _generateHTML() {
     return `
     <!-- First Row Wrapper -->
@@ -26,7 +32,7 @@ class User extends View {
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label for="username" class="col-form-label col-4 text-nowrap">Username:</label>
                         <div class="col-auto">
-                            <input type="text" class="connection form-control" name="username" id="username"
+                            <input type="text" class="Username user form-control" name="username" id="username"
                                 placeholder="Username" aria-label="Username">
                         </div>
                     </div>
@@ -34,7 +40,7 @@ class User extends View {
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label for="password" class="col-form-label col-4 text-nowrap">Password:</label>
                         <div class="col-auto">
-                            <input type="password" class="connection form-control" name="password"
+                            <input type="password" class="Password user form-control" name="password"
                                 id="password" placeholder="Password" minlength="8" aria-label="Password">
                         </div>
                     </div>

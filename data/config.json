@@ -15,7 +15,7 @@
         "detection_threshold": "0.15",
         "speed_units": "KPH",
         "trigger_speed": "30",
-        "laser_state": "Off"
+        "laser_state": "On"
     },
     "user": {
         "username": "",

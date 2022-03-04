@@ -6,7 +6,6 @@ class Settings extends View {
 
   addHandlerSubmitEvents(handler) {
     this._parentElement.addEventListener('submit', function (e) {
-      e.preventDefault();
       handler(e);
     });
   }
@@ -26,6 +25,7 @@ class Settings extends View {
 
   _generateHTML() {
     const ip_type = this._state.network_settings.ip_type;
+    const laser_state = this._state.radar_settings.laser_state;
     return `
     <!-- First Row Wrapper -->
     <div class="row p-0 m-0">
@@ -216,12 +216,14 @@ class Settings extends View {
                             <div class="btn-group col" style="min-width: 207px; max-width: 207px;"
                                 id="laser_state">
                                 <input type="radio" class="btn-check" name="laser" id="laser_on"
-                                    autocomplete="off" value="On">
+                                    autocomplete="off" value="On"
+                                    ${laser_state === 'On' ? 'checked' : ''}>
                                 <label class="btn btn-outline-danger shadow-none text-white"
                                     for="laser_on">On</label>
 
                                 <input type="radio" class="btn-check" name="laser" id="laser_off"
-                                    autocomplete="off" value="Off" checked>
+                                    autocomplete="off" value="Off" 
+                                    ${laser_state === 'Off' ? 'checked' : ''}>
                                 <label class="btn btn-outline-danger shadow-none text-white"
                                     for="laser_off">Off</label>
                             </div>
@@ -256,12 +258,11 @@ class Settings extends View {
                         <!-- Input row -->
                         <form action="/api/backup" class="row mb-2 g-0 d-flex justify-content-between"
                             id="backup_form" name="backup_form">
-                            <label for="backup_btn" class="col-form-label col-12 text-nowrap">Backup current
+                            <label class="col-form-label col-12 text-nowrap">Backup current
                                 configuration to file:</label>
                             <div class="col-auto">
                                 <button class="btn btn-danger" type="submit" name="backup_btn"
-                                    id="backup_btn">Save to
-                                    file</button>
+                                    id="backup_btn">Save to file</button>
                             </div>
                         </form>
                         <!-- Input row -->

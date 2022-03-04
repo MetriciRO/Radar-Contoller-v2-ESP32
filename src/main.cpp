@@ -47,7 +47,7 @@ void setup()
   checkResetBtn();
 
   // Read settings from /config.json and update live state
-  if (readSettings().isNull())
+  if (initializeConfigJSON().isNull())
   {
     logOutput("ERROR: Could not get start-up configuration. Restarting...");
     restartSequence(5);

@@ -4,7 +4,7 @@ AsyncWebServer server(80);
 
 void handleUpload(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool final)
 {
-    StaticJsonDocument<1024> currentConfig = getLiveState();
+    StaticJsonDocument<1024> currentConfig = getState();
     String ip = currentConfig["network_settings"]["ip_address"].as<String>();
 
     String updateError = (String) "<div style=\"margin:0 auto; text-align:center; font-family:arial;\">ERROR ! </br> Could not update the device ! </br> Please try again ! </br><a href=\"http://" + ip + "\">Go back</a></div>";
@@ -79,7 +79,7 @@ void handleUpload(AsyncWebServerRequest *request, const String &filename, size_t
             // close the file handle as the upload is now done
             request->_tempFile.close();
 
-            if (readSettings().isNull())
+            if (initializeConfigJSON().isNull())
             {
                 logOutput("ERROR: Could not update configuration from file. Restarting...");
                 restart_flag = true;
@@ -105,7 +105,8 @@ AsyncCallbackJsonWebHandler *network_handler =
                                             network = json.as<JsonObject>();
                                         }
 
-                                        saveSettings(network, "network_settings");
+                                        // saveSettings(network, "network_settings");
+                                        Serial.print('\n');
                                         Serial.println("Received Settings: ");
                                         serializeJsonPretty(network, Serial);
                                         Serial.print('\n');
@@ -115,66 +116,104 @@ AsyncCallbackJsonWebHandler *network_handler =
 
                                         changed_network_config = true; });
 
-AsyncCallbackJsonWebHandler *input_handler =
-    new AsyncCallbackJsonWebHandler("/api/input/post", [](AsyncWebServerRequest *request, JsonVariant &json)
+AsyncCallbackJsonWebHandler *radar_handler =
+    new AsyncCallbackJsonWebHandler("/api/radar/post", [](AsyncWebServerRequest *request, JsonVariant &json)
                                     {
-                                        StaticJsonDocument<384> input_data;
+                                        StaticJsonDocument<384> radar_data;
                                         if (json.is<JsonArray>())
                                         {
-                                            input_data = json.as<JsonArray>();
+                                            radar_data = json.as<JsonArray>();
                                         }
                                         else if (json.is<JsonObject>())
                                         {
-                                            input_data = json.as<JsonObject>();
+                                            radar_data = json.as<JsonObject>();
                                         }
 
-                                        saveSettings(input_data, "input");
-                                        Serial.println("Received Settings: ");
-                                        serializeJsonPretty(input_data, Serial);
+                                        // saveSettings(radar_data, "radar_settings");
                                         Serial.print('\n');
-                                        input_data.clear();
-                                        request->send(200); });
+                                        Serial.println("Received Settings: ");
+                                        serializeJsonPretty(radar_data, Serial);
+                                        Serial.print('\n');
+                                        radar_data.clear();
+                                        request->send(200, "text/plain", "Radar Settings uploaded."); });
 
 AsyncCallbackJsonWebHandler *user_handler =
     new AsyncCallbackJsonWebHandler("/api/user/post", [](AsyncWebServerRequest *request, JsonVariant &json)
                                     {
-    StaticJsonDocument<384> user_data;
-    if (json.is<JsonArray>())
-    {
-        user_data = json.as<JsonArray>();
-    }
-    else if (json.is<JsonObject>())
-    {
-        user_data = json.as<JsonObject>();
-    }
+                                        StaticJsonDocument<384> user_data;
+                                        if (json.is<JsonArray>())
+                                        {
+                                            user_data = json.as<JsonArray>();
+                                        }
+                                        else if (json.is<JsonObject>())
+                                        {
+                                            user_data = json.as<JsonObject>();
+                                        }
 
-    saveSettings(user_data, "user");
-    Serial.println("Received Settings /api/user/post: ");
-    serializeJsonPretty(user_data, Serial);
-    Serial.print('\n');
-    user_data.clear();
-    // Serial.println(response);
-    restart_flag = true;
-    request->redirect("/dashboard"); });
+                                        saveSettings(user_data, "user");
+                                        Serial.print('\n');
+                                        Serial.println("Received Settings /api/user/post: ");
+                                        serializeJsonPretty(user_data, Serial);
+                                        Serial.print('\n');
+                                        user_data.clear();
+                                        // Serial.println(response);
+                                        restart_flag = true;
+                                        request->send(200, "text/plain", "User Settings changed."); });
 
 // Main server function
 void startEspServer()
 {
     server.on("/api/settings/get", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<1024> json = getLiveState();
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                StaticJsonDocument<1024> json = getState();
 
-                  String response;
-                  serializeJson(json, response);
-                  // Serial.print('\n');
-                  // serializeJsonPretty(json, Serial);
-                  json.clear();
-                  request->send(200, "application/json", response); });
+                String response;
+                Serial.print('\n');
+                Serial.println("Sent settings: /api/get/settings ");
+                serializeJsonPretty(json, Serial);
+                Serial.print('\n');
+                serializeJson(json, response);
+                json.clear();
+                request->send(200, "application/json", response); });
+
+    server.on("/laser/on", HTTP_GET, [](AsyncWebServerRequest *request)
+              {
+                if (user.user_flag())
+                {
+                if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                    return request->requestAuthentication(NULL, false);
+                }
+                // StaticJsonDocument<384> relay_json;
+                // relay_json["relay1"]["state1"] = "On";
+                // updateRelay(relay_json);
+                // saveSettings(relay_json, "relay1");
+                // relay_json.clear();
+                
+                radar_settings.laser_state = "On";
+                digitalWrite(RELAY1, HIGH);
+                request->send(200, "text/plain", "Laser is ON"); });
+
+    server.on("/laser/off", HTTP_GET, [](AsyncWebServerRequest *request)
+              {
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUserPassword().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                // StaticJsonDocument<384> relay_json;
+                // relay_json["relay1"]["state1"] = "Off";
+                // updateRelay(relay_json);
+                // saveSettings(relay_json, "relay1");
+                // relay_json.clear();
+
+                radar_settings.laser_state = "Off";
+                digitalWrite(RELAY1, LOW);
+                request->send(200, "text/plain", "Laser is OFF"); });
 
     server.on("/api/backup", HTTP_GET, [](AsyncWebServerRequest *request)
               {
@@ -196,8 +235,8 @@ void startEspServer()
 
                   if (!JSONtoSettings(json))
                   {
-                      request->send(500);
-                      restart_flag = true;
+                    request->send(500, "text/plain", "Couldn't reset the device !");
+                    restart_flag = true;
                   }
                   logOutput("Soft reset succeeded !");
                   request->send(200, "text/plain", "Soft reset succeeded !");
@@ -214,8 +253,8 @@ void startEspServer()
 
                   if (!JSONtoSettings(json))
                   {
-                      request->send(500);
-                      restart_flag = true;
+                    request->send(500, "text/plain", "Couldn't reset the device !");
+                    restart_flag = true;
                   }
                   logOutput("Factory reset succeeded !");
                   String response = "http://" + network_settings.ip_address;
@@ -229,7 +268,6 @@ void startEspServer()
                       if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
                           return request->requestAuthentication(NULL, false);
                   }
-                  //   request->send(SPIFFS, "/config.json", String(), true);
                   request->send(200, "text/plain", "Multi-Controller will restart in 2 seconds");
                   restart_flag = true; });
 
@@ -241,10 +279,10 @@ void startEspServer()
                           return request->requestAuthentication(NULL, false);
                   }
                   circle.print();
-                //   Serial.println(strlog);
                   request->send(200, "text/plain", strlog); });
 
     server.addHandler(network_handler);
+    server.addHandler(radar_handler);
     server.addHandler(user_handler);
 
     if (user.user_flag())

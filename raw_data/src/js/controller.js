@@ -24,22 +24,24 @@ class Router {
   };
 
   router = async () => {
-    // Get the parsed URl from the addressbar
-    let url = '/' + window.location.hash.slice(1).toLowerCase() || '/';
-    // console.log('url:', url);
+    try {
+      // Get the parsed URl from the addressbar
+      let url = '/' + window.location.hash.slice(1).toLowerCase() || '/';
+      // console.log('url:', url);
+      // Get live state from server on boot-up
+      await model.getLiveState();
+      // Render the Header and footer of the page
+      Navbar.render(url);
 
-    // Get live state from server on boot-up
-    await model.getLiveState();
-
-    // Render the Header and footer of the page
-    Navbar.render(url);
-
-    // Get the page from our hash of supported routes.
-    // If the parsed URL is not in our list of supported routes, redirect to Dashboard
-    let page = this._routes[url] ? this._routes[url] : Dashboard;
-    // console.log('page:', page);
-    page.render(model.state);
-    Logs.render(model.state);
+      // Get the page from our hash of supported routes.
+      // If the parsed URL is not in our list of supported routes, redirect to Dashboard
+      let page = this._routes[url] ? this._routes[url] : Dashboard;
+      // console.log('page:', page);
+      page.render(model.state);
+      Logs.render(model.state);
+    } catch (error) {
+      throw error;
+    }
   };
 }
 
@@ -98,24 +100,21 @@ const controllerUploadData = async function (form) {
     [form.id]: Object.fromEntries(new FormData(form)),
   };
 
-  // 1.5 Open modal with data
+  // 2.5 Open modal with data
   // Modal.render(new_data);
-
-  // 3. Upload new data to server
-  await model.sendData(new_data, form.id);
-  // 4. Update model.state
-  // 5. Update Views
-  form.reset();
-};
-
-const controllerLaserState = async function (target) {
-  // Send current laser value to model
-  await model.sendData(target.value, target.name);
-  // Update Views
+  try {
+    // 3. Upload new data to server
+    await model.postData(new_data, form.id);
+    form.reset();
+    // 4. Update Views
+    await myRouter.router();
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 // Enable or disable network inputs based on Connection Type
-const controllerIpType = function (target) {
+const checkIpTypeChange = function (target) {
   let ip = document.querySelectorAll('.static');
   let current_placeholder = {};
   ip.forEach((element) => {
@@ -148,10 +147,14 @@ const controllerIpType = function (target) {
 
 const controllerResetForm = async function (target) {
   if (target.name === 'reset_btn') {
-    // Send reset request to server
-    await model.sendReset(target);
-    // Re-render after reset
-    await myRouter.router();
+    try {
+      // Send reset request to server
+      await model.getAction(target);
+      // Re-render after reset
+      await myRouter.router();
+    } catch (error) {
+      console.error(error);
+    }
   }
   // Close modal
   Modal.close();
@@ -173,11 +176,12 @@ const controllerUploadFile = function (event) {
         case 'restore_file':
           switch (filename) {
             case 'config.json':
-              console.log('File is good.');
+              console.log('File is valid.');
+              console.log('Changing configuration. Please wait !');
               // Toast
               break;
             default:
-              console.log('File is no good !');
+              console.log('File is not valid !');
               // Toast
               event.preventDefault();
               break;
@@ -208,14 +212,25 @@ const controllerUploadFile = function (event) {
 
 // Handle all submit events on the Settings page
 const controllerSettingsSubmitEvents = async function (event) {
+  // console.log(event.target.name);
   switch (event.target.name) {
     case 'network_settings':
     case 'radar_settings':
+      event.preventDefault();
       controllerUploadData(event.target);
       break;
     case 'restore_form':
     case 'update_form':
       controllerUploadFile(event);
+      break;
+    case 'backup_form':
+      // try {
+      //   event.preventDefault();
+      //   await model.getAction(event.target);
+      // } catch (error) {
+      //   console.error(error);
+      // }
+      break;
     default:
       break;
   }
@@ -227,11 +242,15 @@ const controllerSettingsChangeEvents = async function (target) {
   switch (target.name) {
     case 'ip_type':
       // Handler to enable or disable network inputs based on IP type
-      controllerIpType(target);
+      checkIpTypeChange(target);
       break;
     case 'laser':
-      // Handler to update Laser State
-      await controllerLaserState(target);
+      try {
+        // Handler to update Laser State
+        await model.getAction(target);
+      } catch (error) {
+        console.error(error);
+      }
       break;
     default:
       // Handler to check every Input format
@@ -243,18 +262,26 @@ const controllerSettingsChangeEvents = async function (target) {
 // Handle User data upload
 const controllerUploadUserData = async function (form) {
   if (form.name !== 'user') return;
-  // console.log(form);
-  // Validate User data
+  // 1. Validate form
   if (!validateForm(form)) {
     console.log('Data could not be validated !');
     return;
   }
+  // 2. Get data from form
   const new_data = {
     [form.name]: Object.fromEntries(new FormData(form)),
   };
-  // Send User data to model
-  await model.sendData(new_data, form.id);
-  form.reset();
+  // 2.5 Open modal with data
+  // Modal.render(new_data);
+  try {
+    // 3. Upload new data to server
+    await model.postData(new_data, form.id);
+    form.reset();
+    // 4. Update Views
+    await myRouter.router();
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const init = function () {

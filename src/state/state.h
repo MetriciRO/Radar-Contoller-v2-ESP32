@@ -9,22 +9,22 @@
 // #include <state/relay_state.h>
 #include <state/user_state.h>
 
-// Gets settings from live state and returns a json document to be sent to /api/settings/get
-StaticJsonDocument<1024> getLiveState();
+// Get settings from state and returns a json document to be sent to /api/settings/get
+StaticJsonDocument<1024> getState();
 
 // Updates live state
-void updateLiveState(StaticJsonDocument<1024> &doc);
+void updateState(StaticJsonDocument<1024> &doc);
 
 // Updates relays state
 // void updateRelay(StaticJsonDocument<384> json);
 
 // Reads settings from /config.json and updates live state
-StaticJsonDocument<1024> readSettings();
+StaticJsonDocument<1024> initializeConfigJSON();
 
 // Saves settings to /config.json
 void saveSettings(StaticJsonDocument<384>, String);
 
-// Writes passed json doc to /config.json after a reset or an update and updates live state
+// Writes passed json doc to /config.json after a reset or an update then updates live state
 bool JSONtoSettings(StaticJsonDocument<1024>);
 
 // Resets settings but keeps Network Configuration

@@ -14,14 +14,24 @@ export const AJAX = async function (url, uploadData = undefined) {
       ? fetch(url, {
           method: 'POST',
           headers: {
+            Accept: 'application/json',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(uploadData),
+          redirect: 'follow',
         })
       : fetch(url);
 
     const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
-    const data = await res.json();
+    let data;
+    const content_type = res.headers.get('Content-Type').split(';')[0];
+    if (content_type === 'application/json') {
+      data = await res.json();
+    } else {
+      data = await res.text();
+    }
+
+    console.log('AJAX data', data);
 
     if (!res.ok) throw new Error(`${data.message} (${res.status})`);
 

@@ -49,50 +49,6 @@ void WiFiEvent(WiFiEvent_t event)
     }
 }
 
-void wifiConnection()
-{
-    if (network_settings.ip_type == "Static")
-    {
-        ip_address.fromString(network_settings.ip_address);
-        gateway.fromString(network_settings.gateway);
-        subnet.fromString(network_settings.subnet);
-        dns.fromString(network_settings.dns);
-
-        if (!WiFi.config(ip_address, gateway, subnet, dns))
-        {
-            logOutput("WARNING: Couldn't configure STATIC IP ! Obtaining DHCP IP !");
-        }
-    }
-
-    WiFi.begin(network_settings.ssid.c_str(), network_settings.password.c_str());
-    WiFi.setHostname("Metrici-MultiController-WiFi");
-
-    int k = 0;
-    while (WiFi.status() != WL_CONNECTED && k < 20)
-    {
-        k++;
-        delay(1000);
-        Serial.println((String) "[" + k + "] - Establishing WiFi Connection ... ");
-    }
-
-    if (WiFi.status() != WL_CONNECTED)
-    {
-        logOutput("(1) Could not access Wireless Network ! Trying again...");
-        logOutput("Controller will restart in 5 seconds !");
-        restartSequence(5);
-    }
-
-    network_settings.ip_address = WiFi.localIP().toString();
-    network_settings.gateway = WiFi.gatewayIP().toString();
-    network_settings.subnet = WiFi.subnetMask().toString();
-    network_settings.dns = WiFi.dnsIP().toString();
-    // logOutput((String) "Hostname: " + WiFi.getHostname());
-    logOutput((String) "IP address: " + WiFi.localIP().toString());
-    logOutput((String) "Gateway: " + WiFi.gatewayIP().toString());
-    logOutput((String) "Subnet: " + WiFi.subnetMask().toString());
-    logOutput((String) "DNS: " + WiFi.dnsIP().toString());
-}
-
 void ethConnection()
 {
     // uint8_t mac[] = {};
@@ -155,9 +111,7 @@ void startConnection()
 
     WiFi.onEvent(WiFiEvent);
 
-    if (network_settings.connection == "WiFi")
-        wifiConnection();
-    else if (network_settings.connection == "Ethernet")
+    if (network_settings.connection == "Ethernet")
         ethConnection();
 
     // debug purpose - checking live state

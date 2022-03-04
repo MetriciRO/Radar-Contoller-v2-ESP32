@@ -1,6 +1,6 @@
 #include <state/state.h>
 
-StaticJsonDocument<1024> getLiveState()
+StaticJsonDocument<1024> getState()
 {
     StaticJsonDocument<1024> doc;
 
@@ -29,57 +29,28 @@ StaticJsonDocument<1024> getLiveState()
     return doc;
 }
 
-void updateLiveState(StaticJsonDocument<1024> &doc)
+void updateState(StaticJsonDocument<1024> &doc)
 {
     // serializeJsonPretty(doc, Serial);
     // Serial.println("\n");
 
     network_settings.connection = doc["network_settings"]["connection"] | "Not working";
     network_settings.ip_type = doc["network_settings"]["ip_type"] | "Not working";
-    if (network_settings.connection == "WiFi")
+
+    if (network_settings.ip_type == "DHCP")
     {
-        network_settings.ssid = doc["network_settings"]["ssid"] | "Not working";
-        network_settings.password = doc["network_settings"]["password"] | "Not working";
+        network_settings.ip_address = ETH.localIP().toString();
+        doc["network_settings"]["ip_address"] = network_settings.ip_address;
 
-        if (network_settings.ip_type == "DHCP")
-        {
-            network_settings.ip_address = WiFi.localIP().toString();
-            doc["network_settings"]["ip_address"] = network_settings.ip_address;
+        network_settings.gateway = ETH.gatewayIP().toString();
+        doc["network_settings"]["gateway"] = network_settings.gateway;
 
-            network_settings.gateway = WiFi.gatewayIP().toString();
-            doc["network_settings"]["gateway"] = network_settings.gateway;
+        network_settings.subnet = ETH.subnetMask().toString();
+        doc["network_settings"]["subnet"] = network_settings.subnet;
 
-            network_settings.subnet = WiFi.subnetMask().toString();
-            doc["network_settings"]["subnet"] = network_settings.subnet;
-
-            network_settings.dns = WiFi.dnsIP().toString();
-            doc["network_settings"]["dns"] = network_settings.dns;
-        }
+        network_settings.dns = ETH.dnsIP().toString();
+        doc["network_settings"]["dns"] = network_settings.dns;
     }
-    else if (network_settings.connection == "Ethernet")
-    {
-        network_settings.ssid = "";
-        network_settings.password = "";
-
-        if (network_settings.ip_type == "DHCP")
-        {
-            network_settings.ip_address = ETH.localIP().toString();
-            doc["network_settings"]["ip_address"] = network_settings.ip_address;
-
-            network_settings.gateway = ETH.gatewayIP().toString();
-            doc["network_settings"]["gateway"] = network_settings.gateway;
-
-            network_settings.subnet = ETH.subnetMask().toString();
-            doc["network_settings"]["subnet"] = network_settings.subnet;
-
-            network_settings.dns = ETH.dnsIP().toString();
-            doc["network_settings"]["dns"] = network_settings.dns;
-        }
-    }
-
-    doc["network_settings"]["mac_address_wifi"] = WiFi.macAddress();
-    doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
-
     if (network_settings.ip_type == "Static")
     {
         network_settings.ip_address = doc["network_settings"]["ip_address"] | "Not working";
@@ -88,11 +59,22 @@ void updateLiveState(StaticJsonDocument<1024> &doc)
         network_settings.dns = doc["network_settings"]["dns"] | "Not working";
     }
 
+    doc["network_settings"]["mac_address_wifi"] = WiFi.macAddress();
+    doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
+
+    radar_settings.metrici_server_ip = doc["radar_settings"]["metrici_server_ip"] | "Not working";
+    radar_settings.metrici_server_port = doc["radar_settings"]["metrici_server_port"] | "Not working";
+    radar_settings.detection_direction = doc["radar_settings"]["detection_direction"] | "Not working";
+    radar_settings.detection_threshold = doc["radar_settings"]["detection_threshold"] | "Not working";
+    radar_settings.speed_units = doc["radar_settings"]["speed_units"] | "Not working";
+    radar_settings.trigger_speed = doc["radar_settings"]["trigger_speed"] | "Not working";
+    radar_settings.laser_state = doc["radar_settings"]["laser_state"] | "Not working";
+
     user.setUsername(doc["user"]["username"] | "Not working");
     user.setUserPassword(doc["user"]["password"] | "Not working");
 }
 
-StaticJsonDocument<1024> readSettings()
+StaticJsonDocument<1024> initializeConfigJSON()
 {
     StaticJsonDocument<1024> doc;
     // Open file to read
@@ -129,7 +111,7 @@ StaticJsonDocument<1024> readSettings()
 
     file.close();
 
-    updateLiveState(doc);
+    updateState(doc);
     // serializeJsonPretty(doc, Serial);
 
     return doc;
@@ -223,7 +205,7 @@ void saveSettings(StaticJsonDocument<384> json, String key)
         return;
     }
     // Update Live state
-    updateLiveState(doc);
+    updateState(doc);
 
     doc.clear();
     file.close();
@@ -235,16 +217,6 @@ StaticJsonDocument<1024> softReset()
 
     doc["network_settings"]["connection"] = network_settings.connection;
     doc["network_settings"]["ip_type"] = network_settings.ip_type;
-    if (network_settings.connection == "WiFi")
-    {
-        doc["network_settings"]["ssid"] = network_settings.ssid;
-        doc["network_settings"]["password"] = network_settings.password;
-    }
-    if (network_settings.connection == "Ethernet")
-    {
-        network_settings.ssid = "Ethernet Connection";
-        network_settings.password = "Ethernet Connection";
-    }
     if (network_settings.ip_type == "DHCP")
     {
         doc["network_settings"]["ip_address"] = WiFi.localIP().toString();
@@ -260,8 +232,13 @@ StaticJsonDocument<1024> softReset()
         doc["network_settings"]["dns"] = network_settings.dns;
     }
 
-    doc["network_settings"]["mac_address_wifi"] = "";
-    doc["network_settings"]["mac_address_eth"] = "";
+    doc["radar_settings"]["metrici_server_ip"] = "";
+    doc["radar_settings"]["metrici_server_port"] = "";
+    doc["radar_settings"]["detection_direction"] = "";
+    doc["radar_settings"]["detection_threshold"] = "";
+    doc["radar_settings"]["speed_units"] = "";
+    doc["radar_settings"]["trigger_speed"] = "";
+    doc["radar_settings"]["laser_state"] = "Off";
 
     doc["user"]["username"] = "";
     doc["user"]["password"] = "";
@@ -277,13 +254,6 @@ StaticJsonDocument<1024> factoryReset()
 
     doc["network_settings"]["connection"] = "Ethernet";
     doc["network_settings"]["ip_type"] = "Static";
-    doc["network_settings"]["ssid"] = "";
-    doc["network_settings"]["password"] = "";
-
-    // doc["network_settings"]["connection"] = "WiFi";
-    // doc["network_settings"]["ip_type"] = "Static";
-    // doc["network_settings"]["ssid"] = "Jorje-2.4";
-    // doc["network_settings"]["password"] = "cafea.amara";
 
     doc["network_settings"]["ip_address"] = "192.168.0.100";
     doc["network_settings"]["gateway"] = "192.168.0.1";
@@ -292,8 +262,13 @@ StaticJsonDocument<1024> factoryReset()
     doc["network_settings"]["subnet"] = "255.255.255.0";
     doc["network_settings"]["dns"] = "8.8.8.8";
 
-    doc["network_settings"]["mac_address_wifi"] = "";
-    doc["network_settings"]["mac_address_eth"] = "";
+    doc["radar_settings"]["metrici_server_ip"] = "";
+    doc["radar_settings"]["metrici_server_port"] = "";
+    doc["radar_settings"]["detection_direction"] = "";
+    doc["radar_settings"]["detection_threshold"] = "";
+    doc["radar_settings"]["speed_units"] = "";
+    doc["radar_settings"]["trigger_speed"] = "";
+    doc["radar_settings"]["laser_state"] = "Off";
 
     doc["user"]["username"] = "";
     doc["user"]["password"] = "";
@@ -324,7 +299,7 @@ bool JSONtoSettings(StaticJsonDocument<1024> doc)
         return 0;
     }
 
-    updateLiveState(doc);
+    updateState(doc);
     doc.clear();
     file.close();
 

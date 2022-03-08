@@ -20,13 +20,13 @@ void checkResetBtn()
   {
     logOutput("WARNING: Reset button was pressed !");
     StaticJsonDocument<1024> json = factoryReset();
-    if (JSONtoSettings(json))
+    if (writeJSONtoFile(json))
     {
       restartSequence(2);
     }
     else
     {
-      logOutput("Could not reset");
+      logOutput("ERROR: Could not factory reset. Please restart the device and try again !");
     }
   }
 
@@ -47,7 +47,7 @@ void setup()
   checkResetBtn();
 
   // Read settings from /config.json and update live state
-  if (initializeConfigJSON().isNull())
+  if (!initializeState())
   {
     logOutput("ERROR: Could not get start-up configuration. Restarting...");
     restartSequence(5);

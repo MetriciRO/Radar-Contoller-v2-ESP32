@@ -31,7 +31,6 @@ export const getLiveState = async function () {
 
 export const postData = async function (data, target) {
   // console.log(target);
-  // Update model.state
   try {
     switch (target) {
       case 'network_settings':
@@ -57,8 +56,6 @@ export const postData = async function (data, target) {
   } catch (error) {
     throw error;
   }
-  // Upload data to server
-  // console.log(state);
 };
 
 // export const getDataPeriodically = function (s) {

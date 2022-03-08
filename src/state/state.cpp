@@ -1,38 +1,11 @@
 #include <state/state.h>
 
-StaticJsonDocument<1024> getState()
-{
-    StaticJsonDocument<1024> doc;
-
-    doc["network_settings"]["connection"] = network_settings.connection;
-    doc["network_settings"]["ip_type"] = network_settings.ip_type;
-    // doc["network_settings"]["ssid"] = network_settings.ssid;
-    // doc["network_settings"]["password"] = network_settings.password;
-
-    doc["network_settings"]["ip_address"] = network_settings.ip_address;
-    doc["network_settings"]["gateway"] = network_settings.gateway;
-    doc["network_settings"]["subnet"] = network_settings.subnet;
-    doc["network_settings"]["dns"] = network_settings.dns;
-    doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
-
-    doc["radar_settings"]["metrici_server_ip"] = radar_settings.metrici_server_ip;
-    doc["radar_settings"]["metrici_server_port"] = radar_settings.metrici_server_port;
-    doc["radar_settings"]["detection_direction"] = radar_settings.detection_direction;
-    doc["radar_settings"]["detection_threshold"] = radar_settings.detection_threshold;
-    doc["radar_settings"]["speed_units"] = radar_settings.speed_units;
-    doc["radar_settings"]["trigger_speed"] = radar_settings.trigger_speed;
-    doc["radar_settings"]["laser_state"] = radar_settings.laser_state;
-
-    doc["user"]["username"] = user.getUsername();
-    doc["user"]["password"] = user.getUserPassword();
-
-    return doc;
-}
-
 void updateState(StaticJsonDocument<1024> &doc)
 {
     // serializeJsonPretty(doc, Serial);
     // Serial.println("\n");
+    // if (doc.isNull())
+    //     return;
 
     network_settings.connection = doc["network_settings"]["connection"] | "Not working";
     network_settings.ip_type = doc["network_settings"]["ip_type"] | "Not working";
@@ -62,8 +35,8 @@ void updateState(StaticJsonDocument<1024> &doc)
     doc["network_settings"]["mac_address_wifi"] = WiFi.macAddress();
     doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
 
-    radar_settings.metrici_server_ip = doc["radar_settings"]["metrici_server_ip"] | "Not working";
-    radar_settings.metrici_server_port = doc["radar_settings"]["metrici_server_port"] | "Not working";
+    radar_settings.server_address = doc["radar_settings"]["server_address"] | "Not working";
+    radar_settings.server_port = doc["radar_settings"]["server_port"] | "Not working";
     radar_settings.detection_direction = doc["radar_settings"]["detection_direction"] | "Not working";
     radar_settings.detection_threshold = doc["radar_settings"]["detection_threshold"] | "Not working";
     radar_settings.speed_units = doc["radar_settings"]["speed_units"] | "Not working";
@@ -74,14 +47,14 @@ void updateState(StaticJsonDocument<1024> &doc)
     user.setUserPassword(doc["user"]["password"] | "Not working");
 }
 
-StaticJsonDocument<1024> initializeConfigJSON()
+StaticJsonDocument<1024> createJSONfromFile()
 {
     StaticJsonDocument<1024> doc;
     // Open file to read
     File file = SPIFFS.open("/config.json");
     if (!file)
     {
-        logOutput("ERROR: Failed to get configuration.");
+        logOutput("ERROR(1): Failed to read file configuration.");
         Serial.println("Could not open file to read config !!!");
         doc.clear();
         return doc;
@@ -90,8 +63,8 @@ StaticJsonDocument<1024> initializeConfigJSON()
     int file_size = file.size();
     if (file_size > 1024)
     {
-        logOutput("ERROR: Failed to get configuration.");
-        Serial.println(F("Config file bigger than JSON document. Alocate more capacity !"));
+        logOutput("ERROR(2): Failed to read file configuration.");
+        Serial.println("Config file bigger than JSON document. Alocate more capacity !");
         doc.clear();
         file.close();
         return doc;
@@ -101,7 +74,7 @@ StaticJsonDocument<1024> initializeConfigJSON()
     DeserializationError error = deserializeJson(doc, file);
     if (error)
     {
-        logOutput("ERROR: Failed to get configuration.");
+        logOutput("ERROR(3): Failed to read file configuration.");
         Serial.println("Failed to deserialize file to JSON document.");
         Serial.println(error.c_str());
         doc.clear();
@@ -111,88 +84,18 @@ StaticJsonDocument<1024> initializeConfigJSON()
 
     file.close();
 
-    updateState(doc);
-    // serializeJsonPretty(doc, Serial);
-
     return doc;
 }
 
-// Save settings in /config.json
-void saveSettings(StaticJsonDocument<384> json, String key)
+bool writeJSONtoFile(StaticJsonDocument<1024> doc)
 {
-    StaticJsonDocument<1024> doc;
-    File file = SPIFFS.open("/config.json", "r");
+    // Open file to write
+    File file = SPIFFS.open("/config.json", "w");
     if (!file)
     {
-        logOutput("(1)ERROR: Failed to save settings. Try again.");
-        Serial.println("Could not open file to read config !!!");
-        return;
-    }
-
-    int file_size = file.size();
-    if (file_size > 1024)
-    {
-        logOutput("(2)ERROR: Failed to save settings. Try again.");
-        Serial.println("Config file bigger than JSON document. Alocate more capacity !");
-        doc.clear();
-        return;
-    }
-
-    // Deserialize file to JSON document
-    DeserializationError error = deserializeJson(doc, file);
-    if (error)
-    {
-        logOutput("(3)ERROR: Failed to save settings. Try again.");
-        Serial.println("Failed to read file, using default configuration");
-        return;
-    }
-
-    file.close();
-    String nested_key = "";
-
-    for (JsonPair i : json[key].as<JsonObject>())
-    {
-        nested_key = i.key().c_str();
-        String nested_value = json[key][nested_key].as<String>();
-        nested_value.trim();
-        nested_value.toLowerCase();
-        // Serial.print("nested_value : '");
-        // Serial.print(nested_value);
-        // Serial.println("'");
-
-        // if received value is empty or 'not set' then don't change it in /config.json
-        if (nested_value.length() == 0)
-        {
-            if (nested_key == "username" || nested_key == "password")
-                doc[key][nested_key] = "";
-        }
-        // Set default values when user enters "not set"
-        else if (nested_value == "not set")
-        {
-            if (nested_key == "timer1" || nested_key == "timer2")
-                doc[key][nested_key] = "0";
-            else if (nested_key == "pulse_width" || nested_key == "pulse_gap")
-                doc[key][nested_key] = "90";
-            else
-                doc[key][nested_key] = "not set";
-        }
-        else
-        {
-            doc[key][nested_key] = json[key][nested_key];
-            // if (nested_key == "ip_rfid" || nested_key == "port_rfid")
-            // {
-            //     doc[key][nested_key] = "";
-            //     rfid.activate_rfid = true;
-            // }
-        }
-    }
-
-    file = SPIFFS.open("/config.json", "w");
-    if (!file)
-    {
-        logOutput("(4)ERROR: Failed to save settings. Try again.");
-        Serial.println("Could not open file to read config !!!");
-        return;
+        logOutput("(1)ERROR: Failed to reset. Try again.");
+        Serial.println("Could not open file to write config !!!");
+        return false;
     }
 
     // Serialize JSON document to file
@@ -200,15 +103,108 @@ void saveSettings(StaticJsonDocument<384> json, String key)
     {
         doc.clear();
         file.close();
-        logOutput("(5)ERROR: Failed to save settings. Try again.");
+        logOutput("(2)ERROR: Failed to reset. Try again.");
         Serial.println("Failed to write to file");
-        return;
+        return false;
     }
-    // Update Live state
-    updateState(doc);
 
     doc.clear();
     file.close();
+
+    return true;
+}
+
+void saveSettings(StaticJsonDocument<384> newDataJSON, String key)
+{
+    // 1. Create JSON from current /config.json
+    StaticJsonDocument<1024> currentConfig = createJSONfromFile();
+    if (currentConfig.isNull())
+        return;
+
+    // 2. Replace key[value] from previously created JSON with POSTed data
+    for (JsonPair i : newDataJSON.as<JsonObject>())
+    {
+        String nested_key = i.key().c_str();
+        String value = i.value().as<String>();
+        value.trim();
+        value.toLowerCase();
+
+        Serial.print(nested_key);
+        Serial.print(": ");
+        Serial.println(value);
+
+        // // In case of nested objects:
+        // String nested_key = i.key().c_str();
+        // String nested_value = json[key][nested_key].as<String>();
+        // nested_value.trim();
+        // nested_value.toLowerCase();
+        // // Serial.print("nested_value : '");
+        // // Serial.print(nested_value);
+        // // Serial.println("'");
+
+        // If received value is empty then don't change it in /config.json
+        if (value.length() == 0)
+        {
+            // if (nested_key == "username" || nested_key == "password")
+            //     currentConfig[key][nested_key] = "";
+        }
+        // Reset settings to default values when user enters "reset"
+        else if (value == "reset")
+        {
+            if (nested_key == "detection_direction")
+                currentConfig[key][nested_key] = "Towards";
+            else if (nested_key == "detection_threshold")
+                currentConfig[key][nested_key] = "0.15";
+            else if (nested_key == "speed_units")
+                currentConfig[key][nested_key] = "KPH";
+            else if (nested_key == "trigger_speed")
+                currentConfig[key][nested_key] = "30";
+            else
+                currentConfig[key][nested_key] = "";
+        }
+        else
+        {
+            currentConfig[key][nested_key] = newDataJSON[nested_key];
+        }
+    }
+
+    // 3. Write JSON Document to /config.json
+    if (!writeJSONtoFile(currentConfig))
+        return;
+
+    // Update state objects
+    updateState(currentConfig);
+
+    currentConfig.clear();
+}
+
+StaticJsonDocument<1024> getState()
+{
+    StaticJsonDocument<1024> doc;
+
+    doc["network_settings"]["connection"] = network_settings.connection;
+    doc["network_settings"]["ip_type"] = network_settings.ip_type;
+    // doc["network_settings"]["ssid"] = network_settings.ssid;
+    // doc["network_settings"]["password"] = network_settings.password;
+
+    doc["network_settings"]["ip_address"] = network_settings.ip_address;
+    doc["network_settings"]["gateway"] = network_settings.gateway;
+    doc["network_settings"]["subnet"] = network_settings.subnet;
+    doc["network_settings"]["dns"] = network_settings.dns;
+    doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
+
+    doc["radar_settings"]["server_address"] = radar_settings.server_address;
+    doc["radar_settings"]["server_port"] = radar_settings.server_port;
+    doc["radar_settings"]["detection_direction"] = radar_settings.detection_direction;
+    doc["radar_settings"]["detection_threshold"] = radar_settings.detection_threshold;
+    doc["radar_settings"]["speed_units"] = radar_settings.speed_units;
+    doc["radar_settings"]["trigger_speed"] = radar_settings.trigger_speed;
+    doc["radar_settings"]["laser_state"] = radar_settings.laser_state;
+
+    doc["user"]["username"] = user.getUsername();
+    doc["user"]["password"] = user.getUserPassword();
+
+    return doc;
 }
 
 StaticJsonDocument<1024> softReset()
@@ -232,8 +228,8 @@ StaticJsonDocument<1024> softReset()
         doc["network_settings"]["dns"] = network_settings.dns;
     }
 
-    doc["radar_settings"]["metrici_server_ip"] = "";
-    doc["radar_settings"]["metrici_server_port"] = "";
+    doc["radar_settings"]["server_address"] = "";
+    doc["radar_settings"]["server_port"] = "";
     doc["radar_settings"]["detection_direction"] = "";
     doc["radar_settings"]["detection_threshold"] = "";
     doc["radar_settings"]["speed_units"] = "";
@@ -262,8 +258,8 @@ StaticJsonDocument<1024> factoryReset()
     doc["network_settings"]["subnet"] = "255.255.255.0";
     doc["network_settings"]["dns"] = "8.8.8.8";
 
-    doc["radar_settings"]["metrici_server_ip"] = "";
-    doc["radar_settings"]["metrici_server_port"] = "";
+    doc["radar_settings"]["server_address"] = "";
+    doc["radar_settings"]["server_port"] = "";
     doc["radar_settings"]["detection_direction"] = "";
     doc["radar_settings"]["detection_threshold"] = "";
     doc["radar_settings"]["speed_units"] = "";
@@ -278,30 +274,13 @@ StaticJsonDocument<1024> factoryReset()
     return doc;
 }
 
-bool JSONtoSettings(StaticJsonDocument<1024> doc)
+bool initializeState()
 {
-    // Open file to write
-    File file = SPIFFS.open("/config.json", "w");
-    if (!file)
-    {
-        logOutput("(1)ERROR: Failed to reset. Try again.");
-        Serial.println("Could not open file to write config !!!");
-        return 0;
-    }
-
-    // Serialize JSON document to file
-    if (serializeJsonPretty(doc, file) == 0)
-    {
-        doc.clear();
-        file.close();
-        logOutput("(2)ERROR: Failed to reset. Try again.");
-        Serial.println("Failed to write to file");
-        return 0;
-    }
-
+    // 1. Read from /config.json
+    StaticJsonDocument<1024> doc = createJSONfromFile();
+    if (doc.isNull())
+        return false;
+    // 2. Update state object
     updateState(doc);
-    doc.clear();
-    file.close();
-
-    return 1;
+    return true;
 }

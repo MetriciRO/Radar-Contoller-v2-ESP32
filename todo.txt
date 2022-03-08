@@ -15,3 +15,20 @@ Move .javascript/build to ./data
 Create Modal for Network and Radar Settings forms (same as reset):
     - Empty inputs will not change
     - Maybe replace empty inputs with "WILL NOT CHANGE" or the current value
+
+POST Data Lifecycle:
+ - Post data from interface to server;
+ - On server:
+    * updateState(jsonDoc): read POSTed data and update live state
+    * writeStateToFile(): write live state to /config.json
+
+
+ - Open /config.json
+ - Create JSON Document from /config.json
+ - Replace key[value] in JSON Document
+ - Write JSON Document in /config.json
+
+
+Implement Logs
+
+Implement Toast

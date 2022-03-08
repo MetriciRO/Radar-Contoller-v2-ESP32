@@ -34,8 +34,8 @@ WiFiUDP udp;
 WiFiServer TCPserver(10001);
 
 String radar_command = "";
-// String metrici_server_ip = "0.0.0.0";
-// String metrici_server_port = "0000"; // server port
+// String server_address = "0.0.0.0";
+// String server_port = "0000"; // server port
 String port_old = "";
 
 unsigned int start_timer_serial = 0;
@@ -99,13 +99,13 @@ void radarRoutine()
             }
 
             // Check for SERVER's PORT and initializes UDP
-            if (port_old != radar_settings.metrici_server_port && radar_settings.metrici_server_port != "0000")
+            if (port_old != radar_settings.server_port && radar_settings.server_port != "0000")
             {
-                port_old = radar_settings.metrici_server_port;
+                port_old = radar_settings.server_port;
                 Serial.println("New Server Port: " + port_old);
                 udp.stop();
                 delay(100);
-                udp.begin(radar_settings.metrici_server_port.toInt());
+                udp.begin(radar_settings.server_port.toInt());
             }
 
             // Send UDP packet if trigger was sent from Radar
@@ -115,9 +115,9 @@ void radarRoutine()
                 logOutput("Trigger sent");
                 uint8_t buffer[19] = "statechange,201,1\r";
                 // send packet to server
-                if (radar_settings.metrici_server_ip.length() != 0)
+                if (radar_settings.server_address.length() != 0)
                 {
-                    udp.beginPacket(radar_settings.metrici_server_ip.c_str(), radar_settings.metrici_server_port.toInt());
+                    udp.beginPacket(radar_settings.server_address.c_str(), radar_settings.server_port.toInt());
                     udp.write(buffer, sizeof(buffer));
                     delay(30);
                     Serial.println(udp.endPacket());

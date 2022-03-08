@@ -6,8 +6,8 @@ class Radar
 {
 public:
     // UDP Credentials
-    String metrici_server_ip;
-    String metrici_server_port;
+    String server_address;
+    String server_port;
     // Radar parameters
     String detection_direction;
     String detection_threshold;

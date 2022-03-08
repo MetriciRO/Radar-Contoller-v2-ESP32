@@ -74,12 +74,12 @@ class Dashboard extends View {
                     <!-- Input row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label class="col-form-label col-4 text-nowrap">Server IP:</label>
-                        <label class="col-form-label col-auto text-nowrap">${this._state.radar_settings.metrici_server_ip}</label>
+                        <label class="col-form-label col-auto text-nowrap">${this._state.radar_settings.server_address}</label>
                     </div>
                     <!-- Input row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label class="col-form-label col-4 text-nowrap">Server Port:</label>
-                        <label class="col-form-label col-auto text-nowrap">${this._state.radar_settings.metrici_server_port}</label>
+                        <label class="col-form-label col-auto text-nowrap">${this._state.radar_settings.server_port}</label>
                     </div>
                     <!-- Input row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">

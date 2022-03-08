@@ -15,6 +15,6 @@ export const API_GET_SETTINGS = '/api/settings/get';
 
 export const IP_FORMAT =
   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-export const NUMBER_FORMAT = /^([0-9]{1,5})$/;
+export const NUMBER_FORMAT = /^(0|[1-9]\d*)(\.\d+)?$/;
 export const URL_FORMAT =
   /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;

@@ -42,7 +42,7 @@ void handleUpload(AsyncWebServerRequest *request, const String &filename, size_t
             {
                 if (filename.indexOf("spiffs") > -1) // update spiffs.bin
                 {
-                    if (!JSONtoSettings(currentConfig))
+                    if (!writeJSONtoFile(currentConfig))
                     {
                         request->send(200, "text/html", updateError);
                         restart_flag = true;
@@ -79,7 +79,7 @@ void handleUpload(AsyncWebServerRequest *request, const String &filename, size_t
             // close the file handle as the upload is now done
             request->_tempFile.close();
 
-            if (initializeConfigJSON().isNull())
+            if (!initializeState())
             {
                 logOutput("ERROR: Could not update configuration from file. Restarting...");
                 restart_flag = true;
@@ -95,22 +95,22 @@ void handleUpload(AsyncWebServerRequest *request, const String &filename, size_t
 AsyncCallbackJsonWebHandler *network_handler =
     new AsyncCallbackJsonWebHandler("/api/network/post", [](AsyncWebServerRequest *request, JsonVariant &json)
                                     {
-                                        StaticJsonDocument<384> network;
+                                        StaticJsonDocument<384> network_data;
                                         if (json.is<JsonArray>())
                                         {
-                                            network = json.as<JsonArray>();
+                                            network_data = json.as<JsonArray>();
                                         }
                                         else if (json.is<JsonObject>())
                                         {
-                                            network = json.as<JsonObject>();
+                                            network_data = json.as<JsonObject>();
                                         }
 
-                                        // saveSettings(network, "network_settings");
-                                        Serial.print('\n');
-                                        Serial.println("Received Settings: ");
-                                        serializeJsonPretty(network, Serial);
-                                        Serial.print('\n');
-                                        network.clear();
+                                        saveSettings(network_data, "network_settings");
+                                        // Serial.print('\n');
+                                        // Serial.println("Received Settings: ");
+                                        // serializeJsonPretty(network_data, Serial);
+                                        // Serial.print('\n');
+                                        network_data.clear();
                                         String response = "http://" + network_settings.ip_address;
                                         request->send(200, "text/plain", response);
 
@@ -129,11 +129,11 @@ AsyncCallbackJsonWebHandler *radar_handler =
                                             radar_data = json.as<JsonObject>();
                                         }
 
-                                        // saveSettings(radar_data, "radar_settings");
-                                        Serial.print('\n');
-                                        Serial.println("Received Settings: ");
-                                        serializeJsonPretty(radar_data, Serial);
-                                        Serial.print('\n');
+                                        saveSettings(radar_data, "radar_settings");
+                                        // Serial.print('\n');
+                                        // Serial.println("Received Settings: ");
+                                        // serializeJsonPretty(radar_data, Serial);
+                                        // Serial.print('\n');
                                         radar_data.clear();
                                         request->send(200, "text/plain", "Radar Settings uploaded."); });
 
@@ -151,12 +151,11 @@ AsyncCallbackJsonWebHandler *user_handler =
                                         }
 
                                         saveSettings(user_data, "user");
-                                        Serial.print('\n');
-                                        Serial.println("Received Settings /api/user/post: ");
-                                        serializeJsonPretty(user_data, Serial);
-                                        Serial.print('\n');
+                                        // Serial.print('\n');
+                                        // Serial.println("Received Settings: ");
+                                        // serializeJsonPretty(user_data, Serial);
+                                        // Serial.print('\n');
                                         user_data.clear();
-                                        // Serial.println(response);
                                         restart_flag = true;
                                         request->send(200, "text/plain", "User Settings changed."); });
 
@@ -172,11 +171,12 @@ void startEspServer()
                 }
                 StaticJsonDocument<1024> json = getState();
 
+                // Serial.print('\n');
+                // Serial.println("Sent settings: /api/get/settings ");
+                // serializeJsonPretty(json, Serial);
+                // Serial.print('\n');
+
                 String response;
-                Serial.print('\n');
-                Serial.println("Sent settings: /api/get/settings ");
-                serializeJsonPretty(json, Serial);
-                Serial.print('\n');
                 serializeJson(json, response);
                 json.clear();
                 request->send(200, "application/json", response); });
@@ -233,7 +233,7 @@ void startEspServer()
                   }
                   StaticJsonDocument<1024> json = softReset();
 
-                  if (!JSONtoSettings(json))
+                  if (!writeJSONtoFile(json))
                   {
                     request->send(500, "text/plain", "Couldn't reset the device !");
                     restart_flag = true;
@@ -251,7 +251,7 @@ void startEspServer()
                   }
                   StaticJsonDocument<1024> json = factoryReset();
 
-                  if (!JSONtoSettings(json))
+                  if (!writeJSONtoFile(json))
                   {
                     request->send(500, "text/plain", "Couldn't reset the device !");
                     restart_flag = true;

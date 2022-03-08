@@ -224,12 +224,6 @@ const controllerSettingsSubmitEvents = async function (event) {
       controllerUploadFile(event);
       break;
     case 'backup_form':
-      // try {
-      //   event.preventDefault();
-      //   await model.getAction(event.target);
-      // } catch (error) {
-      //   console.error(error);
-      // }
       break;
     default:
       break;

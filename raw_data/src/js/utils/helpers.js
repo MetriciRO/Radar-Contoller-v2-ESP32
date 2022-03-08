@@ -58,7 +58,7 @@ const correct_format = function (input) {
 // Checks input value
 export const checkInputFormat = function (input, check_format = undefined) {
   // The value won't change
-  if (input.value === 'not set' || input.value.length === 0) {
+  if (input.value === 'reset' || input.value.length === 0) {
     input.classList.remove('correct');
     input.classList.remove('wrong');
     return true;

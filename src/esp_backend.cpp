@@ -130,6 +130,7 @@ AsyncCallbackJsonWebHandler *radar_handler =
                                         }
 
                                         saveSettings(radar_data, "radar_settings");
+                                        sendToRadar();
                                         // Serial.print('\n');
                                         // Serial.println("Received Settings: ");
                                         // serializeJsonPretty(radar_data, Serial);

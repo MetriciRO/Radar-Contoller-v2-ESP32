@@ -52,7 +52,8 @@ void setup()
     logOutput("ERROR: Could not get start-up configuration. Restarting...");
     restartSequence(5);
   }
-
+  // Initialize radar
+  sendToRadar();
   // Connect to a network
   startConnection();
   // Start back-end server

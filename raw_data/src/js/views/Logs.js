@@ -4,6 +4,10 @@ class Logs extends View {
   _parentElement = document.getElementById('logs_container');
   _render_location = 'beforeend';
 
+  addHandlerGetLogs(handler) {
+    setInterval(handler, 1000);
+  }
+
   _generateHTML() {
     return `
     <!-- Third Row Wrapper -->

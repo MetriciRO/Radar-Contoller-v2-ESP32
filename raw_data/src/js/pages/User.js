@@ -6,8 +6,7 @@ class User extends View {
 
   addHandlerUploadUserData(handler) {
     this._parentElement.addEventListener('submit', function (e) {
-      e.preventDefault();
-      handler(e.target);
+      handler(e);
     });
   }
 

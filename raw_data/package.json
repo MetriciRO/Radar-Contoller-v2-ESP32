@@ -4,13 +4,16 @@
   "description": "",
   "default": "index.html",
   "scripts": {
-    "start": "parcel index.html --dist-dir ./dist",
-    "build": "parcel build index.html --dist-dir ./build --no-source-maps"
+    "clean:dist": "rimraf dist",
+    "clean:build": "rimraf build",
+    "start": "npm run clean:dist && parcel index.html --dist-dir ./dist",
+    "build": "npm run clean:build && parcel build index.html --dist-dir ./build --no-source-maps --no-cache"
   },
   "author": "Sloata George",
   "license": "ISC",
   "devDependencies": {
-    "parcel": "^2.3.2"
+    "parcel": "^2.3.2",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "@parcel/compressor-gzip": "^2.3.2",

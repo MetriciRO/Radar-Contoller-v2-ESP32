@@ -74,7 +74,8 @@ class Settings extends View {
                             Address:</label>
                         <div class="col-auto">
                             <input type="text" class="IP-Address ip static form-control" name="ip_address"
-                                id="ip_address" placeholder="IP-Address"
+                                id="ip_address"
+                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'IP-Address'}"
                                 ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                     </div>
@@ -82,8 +83,8 @@ class Settings extends View {
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label for="gateway" class="col-form-label col-4 text-nowrap">Gateway:</label>
                         <div class="col-auto">
-                            <input type="text" class="Gateway ip static form-control" name="gateway" id="gateway"
-                                placeholder="Gateway"
+                            <input type="text" class="Gateway ip static form-control" name="gateway" id="gateway"                                
+                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'Gateway'}"
                                 ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                     </div>
@@ -93,7 +94,8 @@ class Settings extends View {
                             Mask:</label>
                         <div class="col-auto">
                             <input class="Subnet-Mask ip static form-control" list="subnet_options" name="subnet"
-                                id="subnet" placeholder="Subnet-Mask"
+                                id="subnet"
+                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'Subnet-Mask'}"
                                 ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                         <datalist id="subnet_options">
@@ -107,7 +109,7 @@ class Settings extends View {
                         <label for="dns" class="col-form-label col-4 text-nowrap">DNS:</label>
                         <div class="col-auto">
                             <input class="DNS ip static form-control" list="dns_options" name="dns" id="dns"
-                                placeholder="DNS" 
+                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'DNS'}"
                                 ${ip_type === 'DHCP' ? 'disabled' : ''}>
                         </div>
                         <datalist id="dns_options">
@@ -256,7 +258,7 @@ class Settings extends View {
                     <!-- Backup/Restore tab -->
                     <div class="tab-pane active" id="backup">
                         <!-- Input row -->
-                        <form action="/api/backup" class="row mb-2 g-0 d-flex justify-content-between"
+                        <form action="/api/backup" method="get" class="row mb-2 g-0 d-flex justify-content-between"
                             id="backup_form" name="backup_form">
                             <label class="col-form-label col-12 text-nowrap">Backup current
                                 configuration to file:</label>

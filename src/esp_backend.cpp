@@ -189,14 +189,10 @@ void startEspServer()
                 if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
                     return request->requestAuthentication(NULL, false);
                 }
-                // StaticJsonDocument<384> relay_json;
-                // relay_json["relay1"]["state1"] = "On";
-                // updateRelay(relay_json);
-                // saveSettings(relay_json, "relay1");
-                // relay_json.clear();
                 
                 radar_settings.laser_state = "On";
                 digitalWrite(RELAY1, HIGH);
+                logOutput("Laser is ON");
                 request->send(200, "text/plain", "Laser is ON"); });
 
     server.on("/laser/off", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -206,81 +202,84 @@ void startEspServer()
                     if (!request->authenticate(user.getUserPassword().c_str(), user.getUserPassword().c_str()))
                         return request->requestAuthentication(NULL, false);
                 }
-                // StaticJsonDocument<384> relay_json;
-                // relay_json["relay1"]["state1"] = "Off";
-                // updateRelay(relay_json);
-                // saveSettings(relay_json, "relay1");
-                // relay_json.clear();
 
                 radar_settings.laser_state = "Off";
                 digitalWrite(RELAY1, LOW);
+                logOutput("Laser is OFF");
                 request->send(200, "text/plain", "Laser is OFF"); });
 
     server.on("/api/backup", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  request->send(SPIFFS, "/config.json", String(), true); });
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                // Write current state in /config.json
+                StaticJsonDocument<1024> doc = getState();
+                if (!writeJSONtoFile(doc)) {
+                    logOutput("Could not backup current configuration. Try again after restart.");
+                    request->send(200);
+                } else {
+                    request->send(SPIFFS, "/config.json", String(), true);
+                } });
 
     server.on("/api/soft-reset", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<1024> json = softReset();
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                StaticJsonDocument<1024> json = softReset();
 
-                  if (!writeJSONtoFile(json))
-                  {
-                    request->send(500, "text/plain", "Couldn't reset the device !");
-                    restart_flag = true;
-                  }
-                  logOutput("Soft reset succeeded !");
-                  request->send(200, "text/plain", "Soft reset succeeded !");
-                  restart_flag = true; });
+                if (!writeJSONtoFile(json))
+                {
+                request->send(500, "text/plain", "Couldn't reset the device !");
+                restart_flag = true;
+                }
+                logOutput("Soft reset succeeded !");
+                request->send(200, "text/plain", "Soft reset succeeded !");
+                restart_flag = true; });
 
     server.on("/api/factory-reset", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  StaticJsonDocument<1024> json = factoryReset();
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                StaticJsonDocument<1024> json = factoryReset();
 
-                  if (!writeJSONtoFile(json))
-                  {
-                    request->send(500, "text/plain", "Couldn't reset the device !");
-                    restart_flag = true;
-                  }
-                  logOutput("Factory reset succeeded !");
-                  String response = "http://" + network_settings.ip_address;
-                  request->send(200, "text/plain", response);
-                  restart_flag = true; });
+                if (!writeJSONtoFile(json))
+                {
+                request->send(500, "text/plain", "Couldn't reset the device !");
+                restart_flag = true;
+                }
+                logOutput("Factory reset succeeded !");
+                String response = "http://" + network_settings.ip_address;
+                request->send(200, "text/plain", response);
+                restart_flag = true; });
 
     server.on("/api/restart", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  request->send(200, "text/plain", "Multi-Controller will restart in 2 seconds");
-                  restart_flag = true; });
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                request->send(200, "text/plain", "Multi-Controller will restart in 2 seconds");
+                restart_flag = true; });
 
     server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                  if (user.user_flag())
-                  {
-                      if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                          return request->requestAuthentication(NULL, false);
-                  }
-                  circle.print();
-                  request->send(200, "text/plain", strlog); });
+                if (user.user_flag())
+                {
+                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                        return request->requestAuthentication(NULL, false);
+                }
+                circle.print();
+                request->send(200, "text/plain", strlog); });
 
     server.addHandler(network_handler);
     server.addHandler(radar_handler);

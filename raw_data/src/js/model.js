@@ -7,7 +7,7 @@ export const state = {
   radar_settings: {},
   laser: { state: 'Off' },
   user: {},
-  logs: 'Test Logs',
+  logs: '',
 };
 
 const createObject = function (data, object_key) {
@@ -36,18 +36,18 @@ export const postData = async function (data, target) {
       case 'network_settings':
         // Update state object
         state.network_settings = createObject(data, 'network_settings');
-        console.log(state.network_settings);
+        // console.log(state.network_settings);
         // Upload state object
         await AJAX(config.API_POST_NETWORK, state.network_settings);
         break;
       case 'radar_settings':
         state.radar_settings = createObject(data, 'radar_settings');
-        console.log(state.radar_settings);
+        // console.log(state.radar_settings);
         await AJAX(config.API_POST_RADAR, state.radar_settings);
         break;
       case 'user_form':
         state.user = createObject(data, 'user');
-        console.log(state.user);
+        // console.log(state.user);
         await AJAX(config.API_POST_USER, state.user);
         break;
       default:
@@ -57,13 +57,6 @@ export const postData = async function (data, target) {
     throw error;
   }
 };
-
-// export const getDataPeriodically = function (s) {
-//   let interval = setInterval(() => {
-//     getLiveState().catch((error) => console.log(error));
-//   }, s * 1000);
-//   return interval;
-// };
 
 export const getAction = async function (target) {
   try {
@@ -77,7 +70,7 @@ export const getAction = async function (target) {
         await AJAX(config.API_LASER_OFF);
         break;
       case 'backup_form':
-        await AJAX(config.API_GET_BACKUP);
+        // await AJAX(config.API_GET_BACKUP);
         break;
       case 'reset_btn':
         switch (target.innerText) {
@@ -95,6 +88,15 @@ export const getAction = async function (target) {
       default:
         break;
     }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getLogs = async function () {
+  try {
+    const logs = await AJAX(config.API_GET_LOGS);
+    state.logs = logs;
   } catch (error) {
     throw error;
   }

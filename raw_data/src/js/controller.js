@@ -134,6 +134,7 @@ const checkIpTypeChange = function (target) {
     case 'static':
       for (const element of ip) {
         element.removeAttribute('readonly');
+        element.removeAttribute('disabled');
         element.setAttribute(
           'placeholder',
           `${current_placeholder[element.id]}`
@@ -212,18 +213,19 @@ const controllerUploadFile = function (event) {
 
 // Handle all submit events on the Settings page
 const controllerSettingsSubmitEvents = async function (event) {
-  // console.log(event.target.name);
+  // console.log(event.target);
   switch (event.target.name) {
     case 'network_settings':
     case 'radar_settings':
       event.preventDefault();
-      controllerUploadData(event.target);
+      await controllerUploadData(event.target);
       break;
     case 'restore_form':
     case 'update_form':
       controllerUploadFile(event);
       break;
     case 'backup_form':
+      console.log('backup');
       break;
     default:
       break;
@@ -254,8 +256,10 @@ const controllerSettingsChangeEvents = async function (target) {
 };
 
 // Handle User data upload
-const controllerUploadUserData = async function (form) {
+const controllerUploadUserData = async function (event) {
+  const form = event.target;
   if (form.name !== 'user') return;
+  event.preventDefault();
   // 1. Validate form
   if (!validateForm(form)) {
     console.log('Data could not be validated !');
@@ -278,6 +282,15 @@ const controllerUploadUserData = async function (form) {
   }
 };
 
+const controllerGetLogs = async function () {
+  try {
+    await model.getLogs();
+    Logs.render(model.state);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const init = function () {
   for (const evt of ['hashchange', 'load']) {
     window.addEventListener(evt, myRouter.router);
@@ -286,6 +299,7 @@ const init = function () {
   Settings.addHandlerChangeEvents(controllerSettingsChangeEvents);
   Settings.addHandlerOpenModal(controllerOpenModal);
   User.addHandlerUploadUserData(controllerUploadUserData);
+  Logs.addHandlerGetLogs(controllerGetLogs);
 };
 
 init();

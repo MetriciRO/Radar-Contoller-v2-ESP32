@@ -2,11 +2,6 @@
 
 void updateState(StaticJsonDocument<1024> &doc)
 {
-    // serializeJsonPretty(doc, Serial);
-    // Serial.println("\n");
-    // if (doc.isNull())
-    //     return;
-
     network_settings.connection = doc["network_settings"]["connection"] | "Not working";
     network_settings.ip_type = doc["network_settings"]["ip_type"] | "Not working";
 
@@ -24,6 +19,7 @@ void updateState(StaticJsonDocument<1024> &doc)
         network_settings.dns = ETH.dnsIP().toString();
         doc["network_settings"]["dns"] = network_settings.dns;
     }
+
     if (network_settings.ip_type == "Static")
     {
         network_settings.ip_address = doc["network_settings"]["ip_address"] | "Not working";
@@ -32,7 +28,7 @@ void updateState(StaticJsonDocument<1024> &doc)
         network_settings.dns = doc["network_settings"]["dns"] | "Not working";
     }
 
-    doc["network_settings"]["mac_address_wifi"] = WiFi.macAddress();
+    // doc["network_settings"]["mac_address_wifi"] = WiFi.macAddress();
     doc["network_settings"]["mac_address_eth"] = ETH.macAddress();
 
     radar_settings.server_address = doc["radar_settings"]["server_address"] | "Not working";
@@ -215,10 +211,10 @@ StaticJsonDocument<1024> softReset()
     doc["network_settings"]["ip_type"] = network_settings.ip_type;
     if (network_settings.ip_type == "DHCP")
     {
-        doc["network_settings"]["ip_address"] = WiFi.localIP().toString();
-        doc["network_settings"]["gateway"] = WiFi.gatewayIP().toString();
-        doc["network_settings"]["subnet"] = WiFi.subnetMask().toString();
-        doc["network_settings"]["dns"] = WiFi.dnsIP().toString();
+        doc["network_settings"]["ip_address"] = ETH.localIP().toString();
+        doc["network_settings"]["gateway"] = ETH.gatewayIP().toString();
+        doc["network_settings"]["subnet"] = ETH.subnetMask().toString();
+        doc["network_settings"]["dns"] = ETH.dnsIP().toString();
     }
     if (network_settings.ip_type == "Static")
     {

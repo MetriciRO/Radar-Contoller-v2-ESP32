@@ -72,7 +72,7 @@ void loop()
   delay(1);
   if (changed_network_config)
   {
-    Serial.println("Changed NETWORK configuration. Restarting...");
+    logOutput("Changed NETWORK configuration. Restarting...");
     restartSequence(2);
   }
   if (restart_flag)

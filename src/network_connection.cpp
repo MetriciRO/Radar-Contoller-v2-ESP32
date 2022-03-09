@@ -92,10 +92,10 @@ void ethConnection()
     network_settings.subnet = ETH.subnetMask().toString();
     network_settings.dns = ETH.dnsIP().toString();
     // logOutput((String) "Hostname: " + ETH.getHostname());
-    logOutput((String) "IP address: " + ETH.localIP().toString());
-    logOutput((String) "Gateway: " + ETH.gatewayIP().toString());
-    logOutput((String) "Subnet: " + ETH.subnetMask().toString());
-    logOutput((String) "DNS: " + ETH.dnsIP().toString());
+    logOutput((String) "IP address: " + network_settings.ip_address);
+    logOutput((String) "Gateway: " + network_settings.gateway);
+    logOutput((String) "Subnet: " + network_settings.subnet);
+    logOutput((String) "DNS: " + network_settings.dns);
 }
 
 void startConnection()

@@ -1,4 +1,25 @@
 import { TIMEOUT_SEC, IP_FORMAT, NUMBER_FORMAT, URL_FORMAT } from './config';
+import Toastify from 'toastify-js';
+import 'toastify-js/src/toastify.css';
+
+// show a toast notification
+// type: true for info, false for error
+export const toast = function (message, is_error, dest = '') {
+  Toastify({
+    text: message,
+    duration: 3000,
+    close: true,
+    gravity: 'bottom', // `top` or `bottom`
+    position: 'right', // `left`, `center` or `right`
+    offset: {
+      y: '3em', // vertical axis - can be a number or a string indicating unity. eg: '2em'
+    },
+    stopOnFocus: true, // Prevents dismissing of toast on hover
+    className: is_error ? 'error' : 'info',
+    destination: dest,
+    // onClick: function () { } // Callback after click
+  }).showToast();
+};
 
 const timeout = function (s) {
   return new Promise(function (_, reject) {

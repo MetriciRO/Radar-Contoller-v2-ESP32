@@ -5,6 +5,7 @@ import {
   checkInputFormat,
   checkUserDataFormat,
   AJAX,
+  toast,
 } from './utils/helpers.js';
 import { IP_FORMAT, NUMBER_FORMAT, URL_FORMAT } from './utils/config.js';
 import Dashboard from './pages/Dashboard';
@@ -92,7 +93,7 @@ const controllerUploadData = async function (form) {
   if (form.name === 'user') return;
   // 1. Validate form
   if (!validateForm(form)) {
-    console.log('Did not validate data');
+    toast('Data is not valid. Please try again !', true);
     return;
   }
   // 2. Get data from form
@@ -110,6 +111,16 @@ const controllerUploadData = async function (form) {
     await myRouter.router();
   } catch (error) {
     console.error(error);
+    switch (form.id) {
+      case 'network_settings':
+        toast('Network settings were not uploaded. Please try again !', true);
+        break;
+      case 'radar_settings':
+        toast('Radar settings were not uploaded. Please try again !', true);
+        break;
+      default:
+        break;
+    }
   }
 };
 
@@ -155,6 +166,7 @@ const controllerResetForm = async function (target) {
       await myRouter.router();
     } catch (error) {
       console.error(error);
+      toast('Reset was not successful. Please try again !', true);
     }
   }
   // Close modal
@@ -177,13 +189,13 @@ const controllerUploadFile = function (event) {
         case 'restore_file':
           switch (filename) {
             case 'config.json':
-              console.log('File is valid.');
-              console.log('Changing configuration. Please wait !');
-              // Toast
+              toast('File is valid. The device will restart.', false);
               break;
             default:
-              console.log('File is not valid !');
-              // Toast
+              toast(
+                'Configuration file is not valid. Please try again !',
+                true
+              );
               event.preventDefault();
               break;
           }
@@ -192,14 +204,11 @@ const controllerUploadFile = function (event) {
           switch (filename) {
             case 'spiffs.bin':
             case 'firmware.bin':
-              console.log('Update file is valid. Update will proceed');
-              // toast(`File ${filename} was successfully uploaded !`, true);
-              // toast(`The update process has started...`, true);
+              toast(`The update process has started...`, false);
               // updatingToast('Updating...', true);
               break;
             default:
-              // toast('File was not uploaded. Try again !', false);
-              console.log('Update file is not valid. Update is not possible !');
+              toast('Update file is not valid. Please try again !', true);
               event.preventDefault();
               break;
           }
@@ -246,6 +255,7 @@ const controllerSettingsChangeEvents = async function (target) {
         await model.getAction(target);
       } catch (error) {
         console.error(error);
+        toast('Laser state did not change. Please try again !', true);
       }
       break;
     default:
@@ -262,7 +272,7 @@ const controllerUploadUserData = async function (event) {
   event.preventDefault();
   // 1. Validate form
   if (!validateForm(form)) {
-    console.log('Data could not be validated !');
+    toast('User data is not valid. Please try again !', true);
     return;
   }
   // 2. Get data from form
@@ -279,6 +289,7 @@ const controllerUploadUserData = async function (event) {
     await myRouter.router();
   } catch (error) {
     console.error(error);
+    toast('User data was not uploaded. Please try again !', true);
   }
 };
 

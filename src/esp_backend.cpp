@@ -165,11 +165,11 @@ void startEspServer()
 {
     server.on("/api/settings/get", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
+                // if (user.user_flag())
+                // {
+                //     if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
+                //         return request->requestAuthentication(NULL, false);
+                // }
                 StaticJsonDocument<1024> json = getState();
 
                 // Serial.print('\n');
@@ -183,38 +183,19 @@ void startEspServer()
                 request->send(200, "application/json", response); });
 
     server.on("/laser/on", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-                if (user.user_flag())
-                {
-                if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                    return request->requestAuthentication(NULL, false);
-                }
-                
+              {                
                 radar_settings.laser_state = "On";
                 digitalWrite(RELAY1, HIGH);
-                logOutput("Laser is ON");
                 request->send(200, "text/plain", "Laser is ON"); });
 
     server.on("/laser/off", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUserPassword().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
-
                 radar_settings.laser_state = "Off";
                 digitalWrite(RELAY1, LOW);
-                logOutput("Laser is OFF");
                 request->send(200, "text/plain", "Laser is OFF"); });
 
     server.on("/api/backup", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
                 // Write current state in /config.json
                 StaticJsonDocument<1024> doc = getState();
                 if (!writeJSONtoFile(doc)) {
@@ -226,11 +207,6 @@ void startEspServer()
 
     server.on("/api/soft-reset", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
                 StaticJsonDocument<1024> json = softReset();
 
                 if (!writeJSONtoFile(json))
@@ -244,11 +220,6 @@ void startEspServer()
 
     server.on("/api/factory-reset", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
                 StaticJsonDocument<1024> json = factoryReset();
 
                 if (!writeJSONtoFile(json))
@@ -263,21 +234,11 @@ void startEspServer()
 
     server.on("/api/restart", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
                 request->send(200, "text/plain", "Multi-Controller will restart in 2 seconds");
                 restart_flag = true; });
 
     server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                if (user.user_flag())
-                {
-                    if (!request->authenticate(user.getUsername().c_str(), user.getUserPassword().c_str()))
-                        return request->requestAuthentication(NULL, false);
-                }
                 circle.print();
                 request->send(200, "text/plain", strlog); });
 
@@ -287,22 +248,17 @@ void startEspServer()
 
     if (user.user_flag())
     {
-        // server.serveStatic("/settings", SPIFFS, "/settings.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
         server.serveStatic("/", SPIFFS, "/index.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
-        // server.serveStatic("/user", SPIFFS, "/user.html").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
+        // Force the file to be cached for no longer than 1 day
+        server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=86400, must-revalidate").setAuthentication(user.getUsername().c_str(), user.getUserPassword().c_str());
     }
     else
     {
-        // server.serveStatic("/settings", SPIFFS, "/settings.html");
         server.serveStatic("/", SPIFFS, "/index.html");
-        // server.serveStatic("/user", SPIFFS, "/user.html");
+        server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=86400, must-revalidate");
     }
-
-    server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=600");
     server.rewrite("/", "/index.html");
 
-    // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-    //           { request->redirect("/"); });
     server.onNotFound([](AsyncWebServerRequest *request)
                       { request->send(404); });
 

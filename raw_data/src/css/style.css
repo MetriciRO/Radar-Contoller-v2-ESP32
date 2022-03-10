@@ -139,17 +139,17 @@ input[type='file']::file-selector-button:hover {
 }
 
 .info {
-  background: rgb(10, 0, 160);
+  background: rgb(10, 0, 160) !important;
   background: linear-gradient(
     90deg,
     rgba(10, 0, 160, 1) 0%,
     rgba(10, 0, 190, 1) 30%,
     rgba(0, 150, 170, 1) 100%
-  );
+  ) !important;
 }
 
 .error {
-  background: #e11422;
+  background: #e11422 !important;
 }
 
 #logo {

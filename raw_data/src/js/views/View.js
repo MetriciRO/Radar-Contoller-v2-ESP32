@@ -1,3 +1,5 @@
+import Toastify from 'toastify-js';
+
 export default class View {
   _state;
 

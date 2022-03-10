@@ -1,12 +1,14 @@
-export const TIMEOUT_SEC = 10;
+export const TIMEOUT_SEC = 5;
+
 export const API_POST_NETWORK = '/api/network/post';
 export const API_POST_RADAR = '/api/radar/post';
-export const API_POST_LASER = '/api/laser/post';
 export const API_POST_USER = '/api/user/post';
+
 export const API_GET_SOFT_RESET = '/api/soft-reset';
 export const API_GET_FACTORY_RESET = '/api/factory-reset';
 export const API_GET_BACKUP = '/api/backup';
 export const API_GET_LOGS = '/api/logs';
+
 export const API_LASER_ON = '/laser/on';
 export const API_LASER_OFF = '/laser/off';
 

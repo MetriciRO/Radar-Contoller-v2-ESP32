@@ -73,12 +73,12 @@ void loop()
   if (changed_network_config)
   {
     logOutput("Changed NETWORK configuration. Restarting...");
-    restartSequence(2);
+    restartSequence(3);
   }
   if (restart_flag)
   {
     Serial.println("Changed other configuration. Restarting...");
-    restartSequence(2);
+    restartSequence(3);
   }
 
   radarRoutine();

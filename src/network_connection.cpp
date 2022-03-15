@@ -58,6 +58,7 @@ void ethConnection()
     // Serial.println(ETH.macAddress());
 
     ETH.begin();
+    delay(50);
 
     if (network_settings.ip_type == "Static")
     {
@@ -70,6 +71,7 @@ void ethConnection()
         {
             logOutput("WARNING: Couldn't configure STATIC IP ! Obtaining DHCP IP !");
         }
+        delay(50);
     }
 
     int k = 0;

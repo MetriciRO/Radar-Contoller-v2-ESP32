@@ -52,8 +52,6 @@ export const AJAX = async function (url, uploadData = undefined) {
       data = await res.text();
     }
 
-    // console.log('AJAX data', data);
-
     if (!res.ok) throw new Error(`${data.message} (${res.status})`);
 
     return data;

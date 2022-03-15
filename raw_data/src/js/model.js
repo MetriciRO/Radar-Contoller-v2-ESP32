@@ -21,9 +21,6 @@ export const getLiveState = async function () {
     state.network_settings = createObject(data, 'network_settings');
     state.radar_settings = createObject(data, 'radar_settings');
     state.user = createObject(data, 'user');
-    // state.logs = createObject(data, 'logs');
-
-    // console.log('model.state:', state);
   } catch (error) {
     throw error;
   }

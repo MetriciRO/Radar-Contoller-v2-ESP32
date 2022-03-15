@@ -12,9 +12,9 @@ export const API_GET_LOGS = '/api/logs';
 export const API_LASER_ON = '/laser/on';
 export const API_LASER_OFF = '/laser/off';
 
-// export const API_GET_SETTINGS =
-//   'https://mocki.io/v1/1dfa8bc2-9bea-4464-9e50-9e54f0159284';
-export const API_GET_SETTINGS = '/api/settings/get';
+export const API_GET_SETTINGS =
+  'https://mocki.io/v1/1dfa8bc2-9bea-4464-9e50-9e54f0159284';
+// export const API_GET_SETTINGS = '/api/settings/get';
 
 export const IP_FORMAT =
   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;

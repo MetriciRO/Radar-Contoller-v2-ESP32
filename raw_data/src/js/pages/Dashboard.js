@@ -18,11 +18,6 @@ class Dashboard extends View {
                     <h5 class="card-title">Network Settings</h5>
                 </div>
                 <div class="card-body mb-0">
-                    <!-- Connected - Row -->
-                    <div class="row mb-2 g-0 d-flex justify-content-between">
-                        <label class="col-form-label col-4 text-nowrap">Connected: </label>
-                        <label class="col-form-label col-auto text-nowrap" id="connected"></label>
-                    </div>
                     <!-- Conenction Type - Row -->
                     <div class="row mb-2 g-0 d-flex justify-content-between">
                         <label class="col-form-label col-4 text-nowrap">Connection Type: </label>

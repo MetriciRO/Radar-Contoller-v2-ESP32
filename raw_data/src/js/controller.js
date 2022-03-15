@@ -28,7 +28,6 @@ class Router {
     try {
       // Get the parsed URl from the addressbar
       let url = '/' + window.location.hash.slice(1).toLowerCase() || '/';
-      // console.log('url:', url);
       // Get live state from server on boot-up
       await model.getLiveState();
       // Render the Header and footer of the page
@@ -101,8 +100,6 @@ const controllerUploadData = async function (form) {
     [form.id]: Object.fromEntries(new FormData(form)),
   };
 
-  // 2.5 Open modal with data
-  // Modal.render(new_data);
   try {
     // 3. Upload new data to server
     await model.postData(new_data, form.id);
@@ -279,8 +276,7 @@ const controllerUploadUserData = async function (event) {
   const new_data = {
     [form.name]: Object.fromEntries(new FormData(form)),
   };
-  // 2.5 Open modal with data
-  // Modal.render(new_data);
+
   try {
     // 3. Upload new data to server
     await model.postData(new_data, form.id);
@@ -310,7 +306,7 @@ const init = function () {
   Settings.addHandlerChangeEvents(controllerSettingsChangeEvents);
   Settings.addHandlerOpenModal(controllerOpenModal);
   User.addHandlerUploadUserData(controllerUploadUserData);
-  Logs.addHandlerGetLogs(controllerGetLogs);
+  // Logs.addHandlerGetLogs(controllerGetLogs);
 };
 
 init();

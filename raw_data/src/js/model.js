@@ -83,7 +83,7 @@ export const getAction = async function (target) {
       case 'laser_off':
         state.radar_settings.laser_state = 'Off';
         await AJAX(config.API_LASER_OFF);
-        toast('Laser is OFF', false);
+        toast('Laser is OFF', true);
         break;
       case 'backup_form':
         break;

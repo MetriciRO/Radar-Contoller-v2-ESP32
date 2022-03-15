@@ -104,6 +104,10 @@ const controllerUploadData = async function (form) {
     // 3. Upload new data to server
     await model.postData(new_data, form.id);
     form.reset();
+    if (form.name === 'network_settings') {
+      Modal.open(model.state, 'after_network_modal');
+      return;
+    }
     // 4. Update Views
     await myRouter.router();
   } catch (error) {
@@ -154,27 +158,35 @@ const checkIpTypeChange = function (target) {
   }
 };
 
-const controllerResetForm = async function (target) {
+const controllerModalBehaviour = async function (target) {
   if (target.name === 'reset_btn') {
     try {
       // Send reset request to server
       await model.getAction(target);
       // Re-render after reset
       await myRouter.router();
+      // Close Settings reset modal
+      Modal.close();
+      // Open After Reset modal
+      if (target.innerText === 'Factory Reset')
+        Modal.open(model.state, 'after_reset_modal');
     } catch (error) {
+      Modal.close();
       console.error(error);
       toast('Reset was not successful. Please try again !', true);
     }
+  } else {
+    // Close modal when clicking on every other click
+    Modal.close();
   }
-  // Close modal
-  Modal.close();
 };
 
 const controllerOpenModal = function (event) {
+  // If the Settings page clicked button is not one of the two reset buttons then do not open the modal
   if (!event.target.className.split(' ').includes('modal_buton')) return;
   event.preventDefault();
-  Modal.open(event.target.name);
-  Modal.addHandlerResetForm(controllerResetForm);
+  Modal.open(event.target.name, 'reset_modal');
+  Modal.addHandlerForClick(controllerModalBehaviour);
 };
 
 const controllerUploadFile = function (event) {
@@ -186,7 +198,11 @@ const controllerUploadFile = function (event) {
         case 'restore_file':
           switch (filename) {
             case 'config.json':
-              toast('File is valid. The device will restart.', false);
+              Modal.open(null, 'after_upload_file_modal');
+              toast(
+                'The configuration file is valid. The device will restart.',
+                false
+              );
               break;
             default:
               toast(
@@ -201,8 +217,8 @@ const controllerUploadFile = function (event) {
           switch (filename) {
             case 'spiffs.bin':
             case 'firmware.bin':
+              Modal.open(null, 'after_upload_file_modal');
               toast(`The update process has started...`, false);
-              // updatingToast('Updating...', true);
               break;
             default:
               toast('Update file is not valid. Please try again !', true);
@@ -306,7 +322,7 @@ const init = function () {
   Settings.addHandlerChangeEvents(controllerSettingsChangeEvents);
   Settings.addHandlerOpenModal(controllerOpenModal);
   User.addHandlerUploadUserData(controllerUploadUserData);
-  // Logs.addHandlerGetLogs(controllerGetLogs);
+  Logs.addHandlerGetLogs(controllerGetLogs);
 };
 
 init();

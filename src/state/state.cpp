@@ -247,10 +247,10 @@ StaticJsonDocument<1024> factoryReset()
     doc["network_settings"]["connection"] = "Ethernet";
     doc["network_settings"]["ip_type"] = "Static";
 
-    doc["network_settings"]["ip_address"] = "192.168.0.100";
-    doc["network_settings"]["gateway"] = "192.168.0.1";
-    // doc["network_settings"]["ip_address"] = "192.168.100.10";
-    // doc["network_settings"]["gateway"] = "192.168.100.1";
+    // doc["network_settings"]["ip_address"] = "192.168.0.100";
+    // doc["network_settings"]["gateway"] = "192.168.0.1";
+    doc["network_settings"]["ip_address"] = "192.168.100.10";
+    doc["network_settings"]["gateway"] = "192.168.100.1";
     doc["network_settings"]["subnet"] = "255.255.255.0";
     doc["network_settings"]["dns"] = "8.8.8.8";
 

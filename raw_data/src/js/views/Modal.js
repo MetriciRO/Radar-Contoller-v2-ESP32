@@ -83,7 +83,7 @@ class Modal extends View {
       `;
   }
   _generateAfterResetHTML() {
-    const default_ip = '192.168.0.100';
+    const default_ip = '192.168.100.10';
     return `    
     <!-- Backdrop used for modal -->
     <div class="modal-backdrop close-modal">

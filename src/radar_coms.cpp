@@ -157,3 +157,41 @@ void radarRoutine()
         logOutput("Client has disconnected.");
     } // if(client)
 }
+
+void testRadarSerial()
+{
+    // Check if we are receiving serial data from Radar
+    if (USE_SERIAL1.available() > 0)
+    {
+        while (USE_SERIAL1.available())
+        {
+            char radar = USE_SERIAL1.read();
+            delay(10);
+            radar_serial_output += radar; // this adds up all the input
+        }
+        Serial.println(radar_serial_output);
+        start_timer_serial = millis();
+    }
+
+    if (radar_serial_output.length() != 0 && radar_serial_output.indexOf("SET") < 0)
+    {
+        // client.write(radar_serial_output.c_str());
+        logOutput("Measured speed: " + radar_serial_output);
+        radar_serial_output = "";
+    }
+    else if (radar_serial_output.indexOf("SET") > 0 && radar_serial_output.indexOf("OK") > 0)
+    {
+        logOutput("Parameter successfully changed.");
+        radar_serial_output = "";
+    }
+    else if ((delta_timer_serial - start_timer_serial) > 1000)
+    {
+        // client.write("0\r\n");
+        start_timer_serial = millis();
+        radar_serial_output = "";
+    }
+    else
+    {
+        radar_serial_output = "";
+    }
+}

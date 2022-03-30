@@ -71,6 +71,9 @@ void setup()
   Serial.println(WiFi.macAddress());
   Serial.print("ETH MAC - ");
   Serial.println(ETH.macAddress());
+
+  // Initialize TCP Server
+  TCPserver.begin();
 }
 
 void loop()

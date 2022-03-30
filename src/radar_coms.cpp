@@ -47,6 +47,7 @@ void sendToRadar()
 }
 
 WiFiServer TCPserver(10001);
+WiFiUDP udp;
 
 String radar_serial_output = "";
 // String server_address = "0.0.0.0";

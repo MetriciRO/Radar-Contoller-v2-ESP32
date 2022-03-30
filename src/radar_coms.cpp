@@ -1,5 +1,19 @@
 #include <radar_coms.h>
 
+void initializeRadar()
+{
+    USE_SERIAL1.write("SET output1HoldTime 500\r\n");
+    delay(10);
+    USE_SERIAL1.write("SET output1min 10\r\n");
+    delay(10);
+    USE_SERIAL1.write("SET output1max 99\r\n");
+    delay(10);
+    USE_SERIAL1.write("SET output2min 50\r\n");
+    delay(10);
+    USE_SERIAL1.write("SET output2max 99\r\n");
+    delay(10);
+}
+
 void sendToRadar()
 {
     if (radar_settings.speed_units == "MPH")
@@ -10,8 +24,10 @@ void sendToRadar()
     {
         USE_SERIAL1.write("SET speedUnits 1\r\n");
     }
+    delay(10);
     String str_1 = "SET output1min " + radar_settings.trigger_speed + "\r\n";
     USE_SERIAL1.write(str_1.c_str());
+    delay(10);
     if (radar_settings.detection_direction == "Towards")
     {
         USE_SERIAL1.write("SET detectionDirection 0\r\n");
@@ -24,16 +40,15 @@ void sendToRadar()
     {
         USE_SERIAL1.write("SET detectionDirection 2\r\n");
     }
+    delay(10);
     String str_2 = "SET detectionThreshold " + radar_settings.detection_threshold + "\r\n";
     USE_SERIAL1.write(str_2.c_str());
+    delay(10);
 }
 
-// create UDP instance
-WiFiUDP udp;
-// create TCP Server
 WiFiServer TCPserver(10001);
 
-String radar_command = "";
+String radar_serial_output = "";
 // String server_address = "0.0.0.0";
 // String server_port = "0000"; // server port
 String port_old = "";
@@ -54,7 +69,7 @@ void radarRoutine()
         Serial.println((String) "Client IP Address: " + client.remoteIP().toString());
         Serial.println((String) "Client Port: " + client.remotePort());
         logOutput("Client has connected.");
-        radar_command = "";
+        radar_serial_output = "";
         USE_SERIAL1.flush();
         while (client.connected())
         {
@@ -70,32 +85,34 @@ void radarRoutine()
                 while (USE_SERIAL1.available())
                 {
                     char radar = USE_SERIAL1.read();
-                    radar_command += radar; // this adds up all the input
-                    delay(15);
+                    delay(10);
+                    radar_serial_output += radar; // this adds up all the input
                 }
                 start_timer_serial = millis();
             }
-
-            if (radar_command.length() != 0 && radar_command.indexOf("SET") < 0)
+            // Check if received string is a command or not
+            // If it's not a command then its a measured speed and we send it to the TCP Client
+            if (radar_serial_output.length() != 0 && radar_serial_output.indexOf("SET") < 0)
             {
-                client.write(radar_command.c_str());
-                logOutput("Measured speed: " + radar_command);
-                radar_command = "";
+                client.write(radar_serial_output.c_str());
+                logOutput("Measured speed: " + radar_serial_output);
+                radar_serial_output = "";
             }
-            else if (radar_command.indexOf("SET") > 0 && radar_command.indexOf("OK") > 0)
+            // If it's a command then clear the string and signal that a setting changed
+            else if (radar_serial_output.indexOf("SET") > 0 && radar_serial_output.indexOf("OK") > 0)
             {
-                logOutput("Settings successfully applied.");
-                radar_command = "";
+                logOutput("Parameter successfully changed.");
+                radar_serial_output = "";
             }
             else if ((delta_timer_serial - start_timer_serial) > 1000)
             {
                 client.write("0\r\n");
                 start_timer_serial = millis();
-                radar_command = "";
+                radar_serial_output = "";
             }
             else
             {
-                radar_command = "";
+                radar_serial_output = "";
             }
 
             // Check for SERVER's PORT and initializes UDP

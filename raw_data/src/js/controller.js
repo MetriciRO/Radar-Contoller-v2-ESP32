@@ -77,7 +77,7 @@ const controllerInputFormat = function (input) {
 /*
   The user has 3 input posibilities:
     - no input - used to keep(not change) the preious setting;
-    - 'not set' - used for resetting the setting
+    - 'reset' - used for resetting the setting
     - a valid input - used  to create or update a setting
 */
 const validateForm = function (form) {

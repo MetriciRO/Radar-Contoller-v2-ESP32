@@ -14,7 +14,7 @@ void WiFiEvent(WiFiEvent_t event)
     case SYSTEM_EVENT_ETH_START:
         Serial.println(F("ETH Started"));
         // set eth hostname here
-        if (!ETH.setHostname("Metrici-MultiController-Eth"))
+        if (!ETH.setHostname("Metrici-Radar-Eth"))
         {
             Serial.println(F("Ethernet hostname failed to configure"));
         }
@@ -85,7 +85,7 @@ void ethConnection()
     if (!eth_connected)
     {
         logOutput("(1) Could not connect to network ! Trying again...");
-        logOutput("Controller will restart in 5 seconds !");
+        logOutput("Radar will restart in 5 seconds !");
         restartSequence(5);
     }
 
@@ -104,7 +104,7 @@ void startConnection()
 {
     if (!WiFi.mode(WIFI_STA))
     {
-        logOutput("ERROR: Controller couldn't go in STA_MODE. Restarting in 5 seconds.");
+        logOutput("ERROR: Radar couldn't go in STA_MODE. Restarting in 5 seconds.");
         restartSequence(5);
         return;
     }

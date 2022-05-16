@@ -234,7 +234,7 @@ void startEspServer()
 
     server.on("/api/restart", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                request->send(200, "text/plain", "Multi-Controller will restart in 2 seconds");
+                request->send(200, "text/plain", "Radar will restart in 2 seconds");
                 restart_flag = true; });
 
     server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request)

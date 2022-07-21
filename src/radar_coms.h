@@ -22,4 +22,4 @@ void sendToRadar();
 // TCP and UDP routines between Server, ESP and Radar
 void radarRoutine();
 // Check if we are receiving serial data from Radar
-void testRadarSerial();
+void debugRadarOnSerial();

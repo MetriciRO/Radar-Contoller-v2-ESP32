@@ -1,7 +1,5 @@
 #include <logs.h>
 
-String strlog = "";
-
 RingBuffer::RingBuffer(int cap) : buffer(cap), first(0), last(0), sz(0) {}
 
 bool RingBuffer::empty() const { return sz == 0; }
@@ -18,30 +16,38 @@ void RingBuffer::push(String str)
     else
         ++sz;
 }
-void RingBuffer::print() const
+String RingBuffer::print() const
 {
-    strlog = "";
+    String logs = "";
     if (first < last)
         for (size_t i = first; i < last; ++i)
         {
-            strlog += (buffer[i] + "<br>");
+            logs += (buffer[i] + "<br>");
         }
     else
     {
         for (size_t i = first; i < buffer.size(); ++i)
         {
-            strlog += (buffer[i] + "<br>");
+            logs += (buffer[i] + "<br>");
         }
         for (size_t i = 0; i < last; ++i)
         {
-            strlog += (buffer[i] + "<br>");
+            logs += (buffer[i] + "<br>");
         }
     }
+    return logs;
 }
 RingBuffer circle(10);
+RingBuffer debugBuffer(50);
 
-void logOutput(String string1)
+void logOutput(String str)
 {
-    circle.push(string1);
-    Serial.println(string1);
+    circle.push(str);
+    Serial.println(str);
+}
+
+void debugOutput(String str)
+{
+    debugBuffer.push((String) "DEBUG: " + str);
+    Serial.println((String) "DEBUG: " + str);
 }

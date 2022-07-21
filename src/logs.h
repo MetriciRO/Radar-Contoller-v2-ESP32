@@ -1,8 +1,6 @@
 #pragma once
 #include <Arduino.h>
 
-extern String strlog;
-
 struct RingBuffer
 {
 private:
@@ -18,9 +16,11 @@ public:
     bool full() const;
 
     void push(String);
-    void print() const;
+    String print() const;
 };
 
 extern RingBuffer circle;
+extern RingBuffer debugBuffer;
 
 void logOutput(String);
+void debugOutput(String);

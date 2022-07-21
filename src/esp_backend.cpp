@@ -239,8 +239,10 @@ void startEspServer()
 
     server.on("/api/logs", HTTP_GET, [](AsyncWebServerRequest *request)
               {
-                circle.print();
-                request->send(200, "text/plain", strlog); });
+                request->send(200, "text/plain", circle.print()); });
+
+    server.on("/api/debug", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->send(200, "text/html", debugBuffer.print()); });
 
     server.addHandler(network_handler);
     server.addHandler(radar_handler);

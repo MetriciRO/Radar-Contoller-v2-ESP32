@@ -67,10 +67,8 @@ void setup()
   // Start back-end server
   startEspServer();
 
-  Serial.print("WiFi MAC - ");
-  Serial.println(WiFi.macAddress());
-  Serial.print("ETH MAC - ");
-  Serial.println(ETH.macAddress());
+  debugOutput("WiFi MAC - " + WiFi.macAddress());
+  debugOutput("ETH MAC - " + ETH.macAddress());
 
   // Initialize TCP Server
   TCPserver.begin();
@@ -91,5 +89,5 @@ void loop()
   }
 
   radarRoutine();
-  // testRadarSerial();
+  debugRadarOnSerial();
 }

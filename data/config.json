@@ -2,8 +2,8 @@
     "network_settings": {
         "connection": "Ethernet",
         "ip_type": "Static",
-        "ip_address": "192.168.0.100",
-        "gateway": "192.168.0.1",
+        "ip_address": "192.168.100.10",
+        "gateway": "192.168.100.1",
         "subnet": "255.255.255.0",
         "dns": "8.8.8.8",
         "mac_address_eth": ""

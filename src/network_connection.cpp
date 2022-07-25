@@ -58,7 +58,7 @@ void ethConnection()
     // Serial.println(ETH.macAddress());
 
     ETH.begin();
-    delay(50);
+    delay(500);
 
     if (network_settings.ip_type == "Static")
     {

@@ -2,15 +2,18 @@
 
 void initializeRadar()
 {
-    USE_SERIAL1.write("SET output1HoldTime 500\r\n");
-    delay(10);
+    debugOutput("Initalizing radar...");
     USE_SERIAL1.write("SET output1min 10\r\n");
+    debugOutput("SET output1min 10\r\n");
     delay(10);
     USE_SERIAL1.write("SET output1max 99\r\n");
+    debugOutput("SET output1max 99\r\n");
     delay(10);
     USE_SERIAL1.write("SET output2min 50\r\n");
+    debugOutput("SET output2min 50\r\n");
     delay(10);
     USE_SERIAL1.write("SET output2max 99\r\n");
+    debugOutput("SET output2max 99\r\n");
     delay(10);
 }
 
@@ -19,30 +22,37 @@ void sendToRadar()
     if (radar_settings.speed_units == "MPH")
     {
         USE_SERIAL1.write("SET speedUnits 0\r\n");
+        debugOutput((String)"SET speedUnits 0\r\n" + " - MPH");
     }
     else if (radar_settings.speed_units == "KPH")
     {
         USE_SERIAL1.write("SET speedUnits 1\r\n");
+        debugOutput((String) "SET speedUnits 1\r\n" + " - KPH");
     }
     delay(10);
     String str_1 = "SET output1min " + radar_settings.trigger_speed + "\r\n";
     USE_SERIAL1.write(str_1.c_str());
+    debugOutput((String) str_1 + " - Trigger Speed");
     delay(10);
     if (radar_settings.detection_direction == "Towards")
     {
         USE_SERIAL1.write("SET detectionDirection 0\r\n");
+        debugOutput((String) "SET detectionDirection 0\r\n" + " - Towards");
     }
     else if (radar_settings.detection_direction == "Away")
     {
         USE_SERIAL1.write("SET detectionDirection 1\r\n");
+        debugOutput((String) "SET detectionDirection 1\r\n" + " - Away");
     }
     else if (radar_settings.detection_direction == "Bidirectional")
     {
         USE_SERIAL1.write("SET detectionDirection 2\r\n");
+        debugOutput((String) "SET detectionDirection 2\r\n" + " - Bidirectional");
     }
     delay(10);
     String str_2 = "SET detectionThreshold " + radar_settings.detection_threshold + "\r\n";
     USE_SERIAL1.write(str_2.c_str());
+    debugOutput((String) str_2 + " - Detection Threshold");
     delay(10);
 }
 
@@ -66,9 +76,10 @@ void radarRoutine()
 
     // Initialize TCP Connection and send data
     if (client)
-    {
-        Serial.println((String) "Client IP Address: " + client.remoteIP().toString());
-        Serial.println((String) "Client Port: " + client.remotePort());
+    {        
+        debugOutput((String) "Client IP Address: " + client.remoteIP().toString());
+        debugOutput((String) "Client Port: " + client.remotePort());
+        debugOutput("Client has connected.");
         logOutput("Client has connected.");
         radar_serial_output = "";
         USE_SERIAL1.flush();
@@ -97,12 +108,14 @@ void radarRoutine()
             {
                 client.write(radar_serial_output.c_str());
                 logOutput("Measured speed: " + radar_serial_output);
+                debugOutput("Measured speed: " + radar_serial_output);
                 radar_serial_output = "";
             }
             // If it's a command then clear the string and signal that a setting changed
             else if (radar_serial_output.indexOf("SET") > 0 && radar_serial_output.indexOf("OK") > 0)
             {
                 logOutput("Parameter successfully changed.");
+                debugOutput("Parameter successfully changed.");
                 radar_serial_output = "";
             }
             else if ((delta_timer_serial - start_timer_serial) > 1000)
@@ -120,7 +133,7 @@ void radarRoutine()
             if (port_old != radar_settings.server_port && radar_settings.server_port != "0000")
             {
                 port_old = radar_settings.server_port;
-                Serial.println("New Server Port: " + port_old);
+                debugOutput("New Server Port: " + port_old);
                 udp.stop();
                 delay(100);
                 udp.begin(radar_settings.server_port.toInt());
@@ -131,6 +144,7 @@ void radarRoutine()
             {
                 trigger = true;
                 logOutput("Trigger sent");
+                debugOutput("Trigger sent");
                 uint8_t buffer[19] = "statechange,201,1\r";
                 // send packet to server
                 if (radar_settings.server_address.length() != 0)
@@ -144,6 +158,7 @@ void radarRoutine()
                 else
                 {
                     logOutput("ERROR ! No IP for the Server was found. Please enter Server's IP !");
+                    debugOutput("ERROR ! No IP for the Server was found. Please enter Server's IP !");
                 }
                 // delay(520);
             } // if(digitalRead(TRIGGER_PIN) == LOW)
@@ -156,6 +171,7 @@ void radarRoutine()
 
         client.stop();
         logOutput("Client has disconnected.");
+        debugOutput("Client has disconnected.");
     } // if(client)
 }
 

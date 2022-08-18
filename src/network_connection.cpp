@@ -11,7 +11,7 @@ void WiFiEvent(WiFiEvent_t event)
 {
     switch (event)
     {
-    case SYSTEM_EVENT_ETH_START:
+    case ARDUINO_EVENT_ETH_START:
         Serial.println(F("ETH Started"));
         // set eth hostname here
         if (!ETH.setHostname("Metrici-Radar-Eth"))
@@ -19,10 +19,10 @@ void WiFiEvent(WiFiEvent_t event)
             Serial.println(F("Ethernet hostname failed to configure"));
         }
         break;
-    case SYSTEM_EVENT_ETH_CONNECTED:
+    case ARDUINO_EVENT_ETH_CONNECTED:
         Serial.println(F("ETH Connected"));
         break;
-    case SYSTEM_EVENT_ETH_GOT_IP:
+    case ARDUINO_EVENT_ETH_GOT_IP:
         eth_connected = true;
         // Serial.print(F("ETH MAC - "));
         // Serial.print(ETH.macAddress());
@@ -36,11 +36,11 @@ void WiFiEvent(WiFiEvent_t event)
         Serial.print(ETH.linkSpeed());
         Serial.println(F("Mbps"));
         break;
-    case SYSTEM_EVENT_ETH_DISCONNECTED:
+    case ARDUINO_EVENT_ETH_DISCONNECTED:
         Serial.println(F("ETH Disconnected"));
         eth_connected = false;
         break;
-    case SYSTEM_EVENT_ETH_STOP:
+    case ARDUINO_EVENT_ETH_STOP:
         Serial.println(F("ETH Stopped"));
         eth_connected = false;
         break;

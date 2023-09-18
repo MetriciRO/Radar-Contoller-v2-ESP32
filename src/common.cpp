@@ -1,6 +1,7 @@
 #include <common.h>
 
 HardwareSerial USE_SERIAL1(1);
+AsyncWebSocket ws("/ws"); // Create a WebSocket instance
 
 bool changed_network_config = false;
 bool restart_flag = false;

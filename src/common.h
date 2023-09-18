@@ -1,12 +1,13 @@
 #pragma once
 
 #include <Arduino.h>
-#include <AsyncJson.h>
 #include <ArduinoJson.h>
-#include <SPIFFS.h>
+#include <AsyncJson.h>
+#include <ESPAsyncWebServer.h>
 #include <HTTPClient.h>
-#include <logs.h>
+#include <SPIFFS.h>
 #include <ezButton.h>
+#include <logs.h>
 
 #define RELAY1 32
 #define RELAY2 33
@@ -21,6 +22,8 @@
 #define DEBOUNCE_TIME 20
 
 extern HardwareSerial USE_SERIAL1;
+
+extern AsyncWebSocket ws;
 
 extern ezButton triggerPin;
 

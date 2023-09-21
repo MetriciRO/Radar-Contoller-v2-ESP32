@@ -89,5 +89,5 @@ void loop()
   }
 
   radarRoutine();
-  debugRadarOnSerial();
+  // debugRadarOnSerial();
 }

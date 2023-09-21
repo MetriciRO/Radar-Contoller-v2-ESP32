@@ -43,6 +43,11 @@ export async function setupWebSocket() {
           await model.renderLiveState(uri);
         }
       }
+
+      if (logMessage === "radar") {
+        await model.getLogs();
+        Logs.render(model.state);
+      }
     };
 
     socket.onclose = function (event) {

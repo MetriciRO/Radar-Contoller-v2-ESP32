@@ -191,7 +191,7 @@ void startEspServer() {
   server.on("/laser/on", HTTP_GET, [](AsyncWebServerRequest *request) {
     radar_settings.laser_state = "On";
     digitalWrite(RELAY1, HIGH);
-    logOutput("Laser is ON");
+    logOutput("Laser is <span style=\"color: #4CD964;\">ON</span>");
     ws.textAll("laser");
     request->send(200, "text/plain", "Laser is ON");
   });
@@ -199,7 +199,7 @@ void startEspServer() {
   server.on("/laser/off", HTTP_GET, [](AsyncWebServerRequest *request) {
     radar_settings.laser_state = "Off";
     digitalWrite(RELAY1, LOW);
-    logOutput("Laser is OFF");
+    logOutput("Laser is <span style=\"color: #FF3B30;\">OFF</span>");
     ws.textAll("laser");
     request->send(200, "text/plain", "Laser is OFF");
   });

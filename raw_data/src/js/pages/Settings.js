@@ -51,13 +51,13 @@ class Settings extends View {
                             id="check_ip_type">
                             <input type="radio" class="btn-check" name="ip_type" id="dhcp"
                                 autocomplete="off" value="DHCP"
-                                ${ip_type === 'DHCP' ? 'checked' : ''}>
+                                ${ip_type === "DHCP" ? "checked" : ""}>
                             <label class="btn btn-outline-danger shadow-none text-white"
                                 for="dhcp">DHCP</label>
 
                             <input type="radio" class="btn-check" name="ip_type" id="static"
                                 autocomplete="off" value="Static" 
-                                ${ip_type === 'Static' ? 'checked' : ''}>
+                                ${ip_type === "Static" ? "checked" : ""}>
                             <label class="btn btn-outline-danger shadow-none text-white"
                                 for="static">Static</label>
                         </div>
@@ -70,8 +70,8 @@ class Settings extends View {
                         <div class="col-auto">
                             <input type="text" class="IP-Address ip static form-control" name="ip_address"
                                 id="ip_address"
-                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'IP-Address'}"
-                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
+                placeholder="${ip_type === "DHCP" ? "DHCP IP" : "IP-Address"}"
+                                ${ip_type === "DHCP" ? "disabled" : ""}>
                         </div>
                     </div>
                     <!-- Gateway - Input row -->
@@ -79,8 +79,8 @@ class Settings extends View {
                         <label for="gateway" class="col-form-label col-4 text-nowrap">Gateway:</label>
                         <div class="col-auto">
                             <input type="text" class="Gateway ip static form-control" name="gateway" id="gateway"                                
-                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'Gateway'}"
-                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
+                placeholder="${ip_type === "DHCP" ? "DHCP IP" : "Gateway"}"
+                                ${ip_type === "DHCP" ? "disabled" : ""}>
                         </div>
                     </div>
                     <!-- Subnet Mask - Input row -->
@@ -90,8 +90,8 @@ class Settings extends View {
                         <div class="col-auto">
                             <input class="Subnet-Mask ip static form-control" list="subnet_options" name="subnet"
                                 id="subnet"
-                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'Subnet-Mask'}"
-                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
+                placeholder="${ip_type === "DHCP" ? "DHCP IP" : "Subnet-Mask"}"
+                                ${ip_type === "DHCP" ? "disabled" : ""}>
                         </div>
                         <datalist id="subnet_options">
                             <option value="255.255.255.0">
@@ -104,8 +104,8 @@ class Settings extends View {
                         <label for="dns" class="col-form-label col-4 text-nowrap">DNS:</label>
                         <div class="col-auto">
                             <input class="DNS ip static form-control" list="dns_options" name="dns" id="dns"
-                placeholder="${ip_type === 'DHCP' ? 'DHCP IP' : 'DNS'}"
-                                ${ip_type === 'DHCP' ? 'disabled' : ''}>
+                placeholder="${ip_type === "DHCP" ? "DHCP IP" : "DNS"}"
+                                ${ip_type === "DHCP" ? "disabled" : ""}>
                         </div>
                         <datalist id="dns_options">
                             <option value="8.8.8.8">
@@ -214,13 +214,13 @@ class Settings extends View {
                                 id="laser_state">
                                 <input type="radio" class="btn-check" name="laser" id="laser_on"
                                     autocomplete="off" value="On"
-                                    ${laser_state === 'On' ? 'checked' : ''}>
+                                    ${laser_state === "On" ? "checked" : ""}>
                                 <label class="btn btn-outline-danger shadow-none text-white"
                                     for="laser_on">On</label>
 
                                 <input type="radio" class="btn-check" name="laser" id="laser_off"
                                     autocomplete="off" value="Off" 
-                                    ${laser_state === 'Off' ? 'checked' : ''}>
+                                    ${laser_state === "Off" ? "checked" : ""}>
                                 <label class="btn btn-outline-danger shadow-none text-white"
                                     for="laser_off">Off</label>
                             </div>
@@ -311,7 +311,7 @@ class Settings extends View {
                 </div>
                 <p class="px-3 py-2 mb-1">
                     Please upload the provided <span style="color:#e11422">firmware.bin</span> file and/or
-                    <span style="color:#e11422">spiffs.bin</span> file one at a time.
+                    <span style="color:#e11422">littlefs.bin</span> file one at a time.
                 </p>
                 <div class="px-3">
                     Notes:</br>

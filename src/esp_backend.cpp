@@ -24,8 +24,8 @@ void handleUpload(AsyncWebServerRequest *request, const String &filename,
   if (filename.indexOf(".bin") > 0) {
     if (!index) {
       logOutput("The update process has started...");
-      // if filename includes spiffs, update the spiffs partition
-      int cmd = (filename.indexOf("spiffs") > -1) ? U_SPIFFS : U_FLASH;
+      // if filename includes littlefs, update the littlefs partition
+      int cmd = (filename.indexOf("littlefs") > -1) ? U_SPIFFS : U_FLASH;
       if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
         Update.printError(Serial);
         request->send(200, "text/html", updateError);
@@ -43,7 +43,7 @@ void handleUpload(AsyncWebServerRequest *request, const String &filename,
         request->send(200, "text/html", updateError);
       } else // Update Succeeded
       {
-        if (filename.indexOf("spiffs") > -1) // update spiffs.bin
+        if (filename.indexOf("littlefs") > -1) // update littlefs.bin
         {
           if (!writeJSONtoFile(currentConfig)) {
             request->send(200, "text/html", updateError);

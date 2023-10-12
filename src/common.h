@@ -5,9 +5,11 @@
 #include <AsyncJson.h>
 #include <ESPAsyncWebServer.h>
 #include <HTTPClient.h>
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #include <ezButton.h>
 #include <logs.h>
+
+#define SPIFFS LittleFS
 
 #define RELAY1 32
 #define RELAY2 33

@@ -207,7 +207,7 @@ const controllerUploadFile = function (event) {
           break;
         case "update_file":
           switch (filename) {
-            case "spiffs.bin":
+            case "littlefs.bin":
             case "firmware.bin":
               Modal.open(null, "after_upload_file_modal");
               toast(`The update process has started...`, false);
